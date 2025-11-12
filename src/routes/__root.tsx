@@ -25,7 +25,10 @@ export const Route = createRootRouteWithContext<{
         title: "refeat",
       },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "preload", href: appCss, as: "style" },
+      { rel: "stylesheet", href: appCss },
+    ],
   }),
   component: RootComponent,
 });
