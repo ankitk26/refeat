@@ -1,10 +1,20 @@
+import { convexQuery } from "@convex-dev/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Button } from "~/components/ui/button";
+import { api } from "convex/_generated/api";
 
 export const Route = createFileRoute("/")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  return <Button>Click me</Button>;
+  const { data } = useSuspenseQuery(convexQuery(api.tasks.get, {}));
+
+  return (
+    <div>
+      {data.map(({ _id, text }) => (
+        <div key={_id}>{text}</div>
+      ))}
+    </div>
+  );
 }
