@@ -1,0 +1,27 @@
+import { authClient } from "@/lib/auth-client";
+import CreateTrackerButton from "./create-tracker-button";
+import { Button } from "./ui/button";
+
+export default function Header() {
+	const logout = () => {
+		authClient.signOut({
+			fetchOptions: {
+				onSuccess: () => {
+					location.reload();
+				},
+			},
+		});
+	};
+
+	return (
+		<header className="flex items-center justify-between py-4 border-b">
+			<h1 className="text-lg font-semibold">refeat</h1>
+			<div className="flex items-center gap-4">
+				<CreateTrackerButton />
+				<Button type="button" onClick={logout}>
+					Logout
+				</Button>
+			</div>
+		</header>
+	);
+}

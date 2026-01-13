@@ -19,6 +19,7 @@
 		"@tabler/icons-react": "^3.36.1",
 		"@tailwindcss/vite": "^4.1.18",
 		"@tanstack/react-devtools": "^0.7.11",
+		"@tanstack/react-query": "^5.90.16",
 		"@tanstack/react-router": "^1.147.3",
 		"@tanstack/react-router-devtools": "^1.149.0",
 		"@tanstack/react-router-ssr-query": "^1.147.3",
@@ -29,6 +30,7 @@
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"convex": "^1.31.4",
+		"date-fns-tz": "^3.2.0",
 		"react": "^19.2.3",
 		"react-dom": "^19.2.3",
 		"shadcn": "^3.6.3",
@@ -38,7 +40,6 @@
 		"vite-tsconfig-paths": "^6.0.4"
 	},
 	"devDependencies": {
-		"@netlify/vite-plugin-tanstack-start": "^1.2.6",
 		"@tanstack/devtools-vite": "^0.3.12",
 		"@types/node": "^25.0.7",
 		"@types/react": "^19.2.8",

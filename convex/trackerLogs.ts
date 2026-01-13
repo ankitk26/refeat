@@ -1,0 +1,74 @@
+import { ConvexError, v } from "convex/values";
+import { fromZonedTime, toZonedTime } from "date-fns-tz";
+import { mutation } from "./_generated/server";
+
+export const create = mutation({
+	args: {
+		trackerId: v.id("trackers"),
+		clientSideTimezone: v.string(),
+	},
+	handler: async (ctx, args) => {
+		const auth = await ctx.auth.getUserIdentity();
+		if (!auth) {
+			throw new ConvexError("Invalid request");
+		}
+
+		const tracker = await ctx.db.get(args.trackerId);
+		if (!tracker) {
+			throw new ConvexError("Invalid request");
+		}
+
+		const user = await ctx.db
+			.query("users")
+			.withIndex("by_authId", (q) => q.eq("authId", auth.subject))
+			.first();
+		if (!user) {
+			throw new ConvexError("Invalid request");
+		}
+
+		if (tracker.creatorId !== user._id) {
+			throw new ConvexError("Invalid request");
+		}
+
+		const clientSideTimezone = args.clientSideTimezone;
+
+		// Convert start time to user's local date and get start of that day
+		const startInUserTz = toZonedTime(
+			new Date(tracker.startTime),
+			clientSideTimezone
+		);
+		const startUserDay = new Date(
+			startInUserTz.getFullYear(),
+			startInUserTz.getMonth(),
+			startInUserTz.getDate()
+		);
+
+		// Convert server now to user's local date and get start of that day
+		const nowInUserTz = toZonedTime(new Date(), clientSideTimezone);
+		const endUserDay = new Date(
+			nowInUserTz.getFullYear(),
+			nowInUserTz.getMonth(),
+			nowInUserTz.getDate()
+		);
+
+		// Iterate over user's local days
+		for (
+			let cursor = new Date(startUserDay);
+			cursor.getTime() <= endUserDay.getTime();
+			cursor.setDate(cursor.getDate() + 1)
+		) {
+			// Convert this local midnight to UTC epoch
+			const localMidnightUtc = fromZonedTime(cursor, clientSideTimezone);
+
+			await ctx.db.insert("trackerLogs", {
+				trackerId: args.trackerId,
+				logTimeEpoch: localMidnightUtc.getTime(), // UTC epoch of user's local midnight
+				clientSideTimezone: clientSideTimezone,
+				userDay: cursor.getDate(), // day from user's perspective
+				userMonth: cursor.getMonth() + 1, // month from user's perspective
+				userYear: cursor.getFullYear(), // year from user's perspective
+				isAccomplished: false,
+			});
+		}
+	},
+});

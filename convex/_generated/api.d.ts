@@ -15,10 +15,14 @@ import type {
 } from "convex/server";
 import type * as auth from "../auth.js";
 import type * as http from "../http.js";
+import type * as trackerLogs from "../trackerLogs.js";
+import type * as trackers from "../trackers.js";
 
 declare const fullApi: ApiFromModules<{
 	auth: typeof auth;
 	http: typeof http;
+	trackerLogs: typeof trackerLogs;
+	trackers: typeof trackers;
 }>;
 
 /**

@@ -1,8 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ComponentExample } from "@/components/component-example";
 
 export const Route = createFileRoute("/_auth/")({ component: App });
 
 function App() {
-	return <ComponentExample />;
+	return (
+		<div>
+			<h1>e</h1>
+		</div>
+	);
 }

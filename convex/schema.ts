@@ -14,16 +14,18 @@ export default defineSchema({
 		description: v.optional(v.string()),
 		updatedTime: v.number(),
 		creatorId: v.id("users"),
+		startTime: v.number(),
 	}).index("by_creator", ["creatorId"]),
 
 	trackerLogs: defineTable({
-		day: v.number(),
-		month: v.number(),
-		year: v.number(),
-		logTime: v.number(),
 		trackerId: v.id("trackers"),
+		logTimeEpoch: v.number(),
+		clientSideTimezone: v.string(),
 		isAccomplished: v.boolean(),
+		userDay: v.number(),
+		userMonth: v.number(),
+		userYear: v.number(),
 	})
 		.index("by_tracker", ["trackerId"])
-		.index("by_days", ["day", "month", "year"]),
+		.index("by_logTime_timezone", ["logTimeEpoch", "clientSideTimezone"]),
 });
