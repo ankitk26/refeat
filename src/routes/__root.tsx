@@ -1,9 +1,7 @@
-import { authClient } from "@/lib/auth-client";
-import { getToken } from "@/lib/auth-server";
-import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
 import type { ConvexQueryClient } from "@convex-dev/react-query";
-import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
+import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
+import { TanStackDevtools } from "@tanstack/react-devtools";
 import {
 	HeadContent,
 	Outlet,
@@ -13,6 +11,8 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { createServerFn } from "@tanstack/react-start";
+import { authClient } from "@/lib/auth-client";
+import { getToken } from "@/lib/auth-server";
 import appCss from "../styles.css?url";
 
 const getAuth = createServerFn({ method: "GET" }).handler(async () => {
