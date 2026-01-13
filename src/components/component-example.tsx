@@ -91,6 +91,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { authClient } from "@/lib/auth-client";
 
 export function ComponentExample() {
 	return (
@@ -143,6 +144,20 @@ function CardExample() {
 							</AlertDialogFooter>
 						</AlertDialogContent>
 					</AlertDialog>
+					<Button
+						type="button"
+						onClick={() =>
+							authClient.signOut({
+								fetchOptions: {
+									onSuccess: () => {
+										location.reload();
+									},
+								},
+							})
+						}
+					>
+						Logout
+					</Button>
 					<Badge variant="secondary" className="ml-auto">
 						Warning
 					</Badge>
