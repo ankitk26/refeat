@@ -14,6 +14,8 @@ export default function TrackerMonthStatus(props: Props) {
 		convexQuery(api.trackerLogs.list, {
 			range: "month",
 			trackerId: props.trackerId,
+			month: new Date().getMonth() + 1,
+			year: new Date().getFullYear(),
 		})
 	);
 

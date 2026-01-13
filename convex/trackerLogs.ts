@@ -76,6 +76,8 @@ export const create = mutation({
 export const list = query({
 	args: {
 		range: v.union(v.literal("month"), v.literal("year")),
+		month: v.number(),
+		year: v.number(),
 		trackerId: v.id("trackers"),
 	},
 	handler: async (ctx, args) => {
@@ -101,9 +103,24 @@ export const list = query({
 			throw new ConvexError("Invalid request");
 		}
 
+		if (args.range === "month") {
+			const logs = await ctx.db
+				.query("trackerLogs")
+				.withIndex("by_tracker_month_year", (q) =>
+					q
+						.eq("trackerId", args.trackerId)
+						.eq("userMonth", args.month)
+						.eq("userYear", args.year)
+				)
+				.collect();
+			return logs;
+		}
+
 		const logs = await ctx.db
 			.query("trackerLogs")
-			.withIndex("by_tracker", (q) => q.eq("trackerId", args.trackerId))
+			.withIndex("by_tracker_year", (q) =>
+				q.eq("trackerId", args.trackerId).eq("userYear", args.year)
+			)
 			.collect();
 
 		return logs;

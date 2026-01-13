@@ -18,6 +18,9 @@ export default function CreateTrackerButton() {
 
 	const createTrackerMutation = useMutation({
 		mutationFn: useConvexMutation(api.trackers.create),
+		onSuccess: () => {
+			setTrackerName("");
+		},
 	});
 
 	const createTrackerHandler = () => {

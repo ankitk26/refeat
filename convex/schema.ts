@@ -28,5 +28,7 @@ export default defineSchema({
 		userYear: v.number(),
 	})
 		.index("by_tracker", ["trackerId"])
-		.index("by_logTime_timezone", ["logTimeEpoch", "clientSideTimezone"]),
+		.index("by_logTime_timezone", ["logTimeEpoch", "clientSideTimezone"])
+		.index("by_tracker_month_year", ["trackerId", "userMonth", "userYear"])
+		.index("by_tracker_year", ["trackerId", "userYear"]),
 });
