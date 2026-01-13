@@ -15,6 +15,7 @@ export default defineSchema({
 		updatedTime: v.number(),
 		creatorId: v.id("users"),
 		startTime: v.number(),
+		clientSideTimezone: v.string(),
 	}).index("by_creator", ["creatorId"]),
 
 	trackerLogs: defineTable({

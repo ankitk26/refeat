@@ -1,6 +1,6 @@
 import { ConvexError, v } from "convex/values";
 import { api } from "./_generated/api";
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 
 export const create = mutation({
 	args: {
@@ -25,10 +25,34 @@ export const create = mutation({
 			name: args.name,
 			updatedTime: Date.now(),
 			startTime: args.startTime,
+			clientSideTimezone: args.clientSideTimezone,
 		});
 		await ctx.runMutation(api.trackerLogs.create, {
 			trackerId: insertedTrackerId,
 			clientSideTimezone: args.clientSideTimezone,
 		});
+	},
+});
+
+export const list = query({
+	handler: async (ctx) => {
+		const auth = await ctx.auth.getUserIdentity();
+		if (!auth) {
+			throw new ConvexError("Invalid request");
+		}
+		const user = await ctx.db
+			.query("users")
+			.withIndex("by_authId", (q) => q.eq("authId", auth.subject))
+			.first();
+		if (!user) {
+			throw new ConvexError("Invalid request");
+		}
+
+		const trackers = await ctx.db
+			.query("trackers")
+			.withIndex("by_creator", (q) => q.eq("creatorId", user._id))
+			.collect();
+
+		return trackers;
 	},
 });

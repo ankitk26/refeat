@@ -1,6 +1,6 @@
 import { ConvexError, v } from "convex/values";
 import { fromZonedTime, toZonedTime } from "date-fns-tz";
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 
 export const create = mutation({
 	args: {
@@ -70,5 +70,42 @@ export const create = mutation({
 				isAccomplished: false,
 			});
 		}
+	},
+});
+
+export const list = query({
+	args: {
+		range: v.union(v.literal("month"), v.literal("year")),
+		trackerId: v.id("trackers"),
+	},
+	handler: async (ctx, args) => {
+		const auth = await ctx.auth.getUserIdentity();
+		if (!auth) {
+			throw new ConvexError("Invalid request");
+		}
+
+		const tracker = await ctx.db.get(args.trackerId);
+		if (!tracker) {
+			throw new ConvexError("Invalid request");
+		}
+
+		const user = await ctx.db
+			.query("users")
+			.withIndex("by_authId", (q) => q.eq("authId", auth.subject))
+			.first();
+		if (!user) {
+			throw new ConvexError("Invalid request");
+		}
+
+		if (tracker.creatorId !== user._id) {
+			throw new ConvexError("Invalid request");
+		}
+
+		const logs = await ctx.db
+			.query("trackerLogs")
+			.withIndex("by_tracker", (q) => q.eq("trackerId", args.trackerId))
+			.collect();
+
+		return logs;
 	},
 });
