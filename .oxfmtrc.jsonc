@@ -1,11 +1,12 @@
 {
-	"$schema": "./node_modules/oxfmt/configuration_schema.json",
-	"useTabs": true,
-	"tabWidth": 2,
-	"printWidth": 80,
-	"trailingComma": "es5",
-	"experimentalSortImports": {
-		"order": "asc",
-		"newlinesBetween": false,
-	},
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "useTabs": true,
+  "tabWidth": 2,
+  "printWidth": 80,
+  "trailingComma": "es5",
+  "experimentalSortImports": {
+    "order": "asc",
+    "newlinesBetween": false,
+  },
+  "ignorePatterns": ["src/routeTree.gen.ts", "covex/_generated/*"],
 }

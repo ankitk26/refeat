@@ -18,7 +18,7 @@ export default function Header() {
 			<h1 className="text-lg font-semibold">refeat</h1>
 			<div className="flex items-center gap-4">
 				<CreateTrackerButton />
-				<Button type="button" onClick={logout}>
+				<Button type="button" variant="secondary" onClick={logout}>
 					Logout
 				</Button>
 			</div>
