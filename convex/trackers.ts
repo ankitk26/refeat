@@ -51,6 +51,7 @@ export const list = query({
 		const trackers = await ctx.db
 			.query("trackers")
 			.withIndex("by_creator", (q) => q.eq("creatorId", user._id))
+			.order("desc")
 			.collect();
 
 		return trackers;

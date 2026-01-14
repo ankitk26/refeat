@@ -24,13 +24,13 @@ export default function TrackerMonthStatus(props: Props) {
 	}
 
 	return (
-		<div>
+		<div className="flex items-center flex-wrap gap-1.5">
 			{data?.map((log) => (
 				<IconCircleFilled
 					key={log._id}
 					className={cn(
 						"size-2.5",
-						log.isAccomplished ? "text-emerald-600" : "text-rose-600"
+						log.isAccomplished ? "text-emerald-500" : "text-red-500"
 					)}
 				/>
 			))}

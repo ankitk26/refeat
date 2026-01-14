@@ -18,9 +18,9 @@ export default function TrackerCards() {
 	}
 
 	return (
-		<div className="grid grid-cols-4 w-full space-x-8">
+		<div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
 			{data?.map((tracker) => (
-				<Card key={tracker._id} className="col-span-1">
+				<Card key={tracker._id} className="col-span-1 w-full">
 					<CardHeader>
 						<CardTitle>{tracker.name}</CardTitle>
 						<CardDescription>
