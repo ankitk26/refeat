@@ -10,6 +10,7 @@ import {
 	DialogTitle,
 	Dialog,
 	DialogTrigger,
+	DialogClose,
 } from "./ui/dialog";
 import { Input } from "./ui/input";
 
@@ -47,9 +48,13 @@ export default function CreateTrackerButton() {
 					onChange={(e) => setTrackerName(e.target.value)}
 				/>
 				<DialogFooter>
-					<Button type="reset" variant="outline">
-						Cancel
-					</Button>
+					<DialogClose
+						render={
+							<Button type="reset" variant="outline">
+								Cancel
+							</Button>
+						}
+					></DialogClose>
 					<Button type="submit" onClick={createTrackerHandler}>
 						Add
 					</Button>

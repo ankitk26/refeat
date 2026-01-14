@@ -1,8 +1,8 @@
 import { ConvexError, v } from "convex/values";
 import { fromZonedTime, toZonedTime } from "date-fns-tz";
-import { mutation, query } from "./_generated/server";
+import { internalMutation, query } from "./_generated/server";
 
-export const create = mutation({
+export const create = internalMutation({
 	args: {
 		trackerId: v.id("trackers"),
 		clientSideTimezone: v.string(),

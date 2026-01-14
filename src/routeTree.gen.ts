@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthIndexRouteImport } from './routes/_auth.index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api.auth.$'
+import { Route as AuthTrackersTrackerIdRouteImport } from './routes/_auth.trackers.$trackerId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -33,15 +34,22 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthTrackersTrackerIdRoute = AuthTrackersTrackerIdRouteImport.update({
+  id: '/trackers/$trackerId',
+  path: '/trackers/$trackerId',
+  getParentRoute: () => AuthRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/': typeof AuthIndexRoute
+  '/trackers/$trackerId': typeof AuthTrackersTrackerIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/': typeof AuthIndexRoute
+  '/trackers/$trackerId': typeof AuthTrackersTrackerIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
@@ -49,14 +57,21 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
   '/_auth/': typeof AuthIndexRoute
+  '/_auth/trackers/$trackerId': typeof AuthTrackersTrackerIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/login' | '/' | '/api/auth/$'
+  fullPaths: '/login' | '/' | '/trackers/$trackerId' | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/' | '/api/auth/$'
-  id: '__root__' | '/_auth' | '/login' | '/_auth/' | '/api/auth/$'
+  to: '/login' | '/' | '/trackers/$trackerId' | '/api/auth/$'
+  id:
+    | '__root__'
+    | '/_auth'
+    | '/login'
+    | '/_auth/'
+    | '/_auth/trackers/$trackerId'
+    | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -95,15 +110,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_auth/trackers/$trackerId': {
+      id: '/_auth/trackers/$trackerId'
+      path: '/trackers/$trackerId'
+      fullPath: '/trackers/$trackerId'
+      preLoaderRoute: typeof AuthTrackersTrackerIdRouteImport
+      parentRoute: typeof AuthRoute
+    }
   }
 }
 
 interface AuthRouteChildren {
   AuthIndexRoute: typeof AuthIndexRoute
+  AuthTrackersTrackerIdRoute: typeof AuthTrackersTrackerIdRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthIndexRoute: AuthIndexRoute,
+  AuthTrackersTrackerIdRoute: AuthTrackersTrackerIdRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
