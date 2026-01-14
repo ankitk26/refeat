@@ -8,5 +8,5 @@
     "order": "asc",
     "newlinesBetween": false,
   },
-  "ignorePatterns": ["src/routeTree.gen.ts", "covex/_generated/*"],
+  "ignorePatterns": ["src/routeTree.gen.ts", "convex/_generated/*"],
 }
