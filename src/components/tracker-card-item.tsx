@@ -1,5 +1,5 @@
 import { useConvexMutation } from "@convex-dev/react-query";
-import { IconDots, IconEdit, IconTrash } from "@tabler/icons-react";
+import { IconDots, IconEdit, IconLoader, IconTrash } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { api } from "convex/_generated/api";
@@ -56,6 +56,21 @@ export default function TrackerCardItem({ tracker }: Props) {
 		mutationFn: useConvexMutation(api.trackers.update),
 		onSuccess: () => setIsEditDialogOpen(false),
 	});
+	const updateLogStatusMutation = useMutation({
+		mutationFn: useConvexMutation(api.trackerLogs.updateStatus),
+	});
+
+	const updateLogStatus = (isAccomplished: boolean) => {
+		updateLogStatusMutation.mutate({
+			trackerId: tracker._id,
+			isAccomplished: isAccomplished,
+			userCurrentDate: {
+				day: new Date().getDate(),
+				month: new Date().getMonth() + 1,
+				year: new Date().getFullYear(),
+			},
+		});
+	};
 
 	const deleteTracker = () => {
 		deleteTrackerMutation.mutate({ trackerId: tracker._id });
@@ -104,8 +119,28 @@ export default function TrackerCardItem({ tracker }: Props) {
 						</DropdownMenu>
 					</CardAction>
 				</CardHeader>
-				<CardContent>
+				<CardContent className="space-y-4">
 					<TrackerMonthStatus trackerId={tracker._id} />
+					<div className="flex gap-2 pt-4 border-t">
+						<Button
+							type="button"
+							variant="default"
+							size="sm"
+							className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600 hover:border-emerald-700"
+							onClick={() => updateLogStatus(true)}
+						>
+							Completed
+						</Button>
+						<Button
+							type="button"
+							variant="outline"
+							size="sm"
+							className="flex-1"
+							onClick={() => updateLogStatus(false)}
+						>
+							Didn't do it
+						</Button>
+					</div>
 				</CardContent>
 			</Card>
 			<AlertDialog open={isAlertDialogOpen} onOpenChange={setIsAlertDialogOpen}>
@@ -116,8 +151,16 @@ export default function TrackerCardItem({ tracker }: Props) {
 					</AlertDialogDescription>
 					<AlertDialogFooter>
 						<AlertDialogCancel>Cancel</AlertDialogCancel>
-						<AlertDialogAction variant="destructive" onClick={deleteTracker}>
-							Delete
+						<AlertDialogAction
+							variant="destructive"
+							onClick={deleteTracker}
+							disabled={deleteTrackerMutation.isPending}
+						>
+							{deleteTrackerMutation.isPending ? (
+								<IconLoader className="animate-spin" />
+							) : (
+								"Delete"
+							)}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>
