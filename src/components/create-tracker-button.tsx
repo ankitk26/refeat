@@ -1,9 +1,11 @@
 import { useConvexMutation } from "@convex-dev/react-query";
-import { IconLoader } from "@tabler/icons-react";
+import { IconCalendar, IconLoader, IconTarget } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { api } from "convex/_generated/api";
+import { format } from "date-fns";
 import { useState } from "react";
 import { Button } from "./ui/button";
+import { Calendar } from "./ui/calendar";
 import {
 	DialogContent,
 	DialogHeader,
@@ -15,41 +17,36 @@ import {
 } from "./ui/dialog";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
 export default function CreateTrackerButton() {
 	const [trackerName, setTrackerName] = useState("");
-	const [startDate, setStartDate] = useState(() => {
-		// Default to today's date in YYYY-MM-DD format
-		const today = new Date();
-		const year = today.getFullYear();
-		const month = String(today.getMonth() + 1).padStart(2, "0");
-		const day = String(today.getDate()).padStart(2, "0");
-		return `${year}-${month}-${day}`;
+	const [startDate, setStartDate] = useState<Date | undefined>(() => {
+		// Default to today's date
+		return new Date();
 	});
+
+	const currentYear = new Date().getFullYear();
 
 	const createTrackerMutation = useMutation({
 		mutationFn: useConvexMutation(api.trackers.create),
 		onSuccess: () => {
 			setTrackerName("");
 			// Reset to today's date
-			const today = new Date();
-			const year = today.getFullYear();
-			const month = String(today.getMonth() + 1).padStart(2, "0");
-			const day = String(today.getDate()).padStart(2, "0");
-			setStartDate(`${year}-${month}-${day}`);
+			setStartDate(new Date());
 		},
 	});
 
 	const createTrackerHandler = () => {
+		if (!startDate) return;
+
 		const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-		// Parse the selected date string (YYYY-MM-DD format)
-		// Date input gives us a string that represents a date in local timezone
-		const [year, month, day] = startDate.split("-").map(Number);
-
 		// Create a date at midnight in the user's local timezone
-		// Note: month is 0-indexed in JavaScript Date constructor
-		const startDateLocal = new Date(year, month - 1, day, 0, 0, 0, 0);
+		const year = startDate.getFullYear();
+		const month = startDate.getMonth();
+		const day = startDate.getDate();
+		const startDateLocal = new Date(year, month, day, 0, 0, 0, 0);
 
 		// Convert to epoch time (this represents local midnight)
 		const startTimeEpoch = startDateLocal.getTime();
@@ -63,8 +60,14 @@ export default function CreateTrackerButton() {
 
 	return (
 		<Dialog>
-			<DialogTrigger render={<Button type="button">New goal</Button>} />
-			<DialogContent>
+			<DialogTrigger
+				render={
+					<Button type="button">
+						<IconTarget /> New goal
+					</Button>
+				}
+			/>
+			<DialogContent className="overflow-hidden">
 				<DialogHeader>
 					<DialogTitle>Create new tracker</DialogTitle>
 				</DialogHeader>
@@ -82,12 +85,37 @@ export default function CreateTrackerButton() {
 						<Label htmlFor="start-date">
 							When do you want to start tracking?
 						</Label>
-						<Input
-							id="start-date"
-							type="date"
-							value={startDate}
-							onChange={(e) => setStartDate(e.target.value)}
-						/>
+						<div className="relative">
+							<Popover>
+								<PopoverTrigger
+									render={
+										<Button
+											id="start-date"
+											variant="outline"
+											className="w-full justify-start text-left font-normal"
+										>
+											<IconCalendar className="mr-2 h-4 w-4" />
+											{startDate ? (
+												format(startDate, "PPP")
+											) : (
+												<span>Pick a date</span>
+											)}
+										</Button>
+									}
+								/>
+								<PopoverContent className="w-auto p-0" align="start">
+									<Calendar
+										mode="single"
+										selected={startDate}
+										onSelect={setStartDate}
+										captionLayout="dropdown"
+										startMonth={new Date(currentYear - 1, 0)}
+										endMonth={new Date(currentYear + 1, 0)}
+										autoFocus
+									/>
+								</PopoverContent>
+							</Popover>
+						</div>
 					</div>
 				</div>
 				<DialogFooter>
@@ -101,7 +129,11 @@ export default function CreateTrackerButton() {
 					<Button
 						type="submit"
 						onClick={createTrackerHandler}
-						disabled={!trackerName.trim() || createTrackerMutation.isPending}
+						disabled={
+							!trackerName.trim() ||
+							!startDate ||
+							createTrackerMutation.isPending
+						}
 					>
 						{createTrackerMutation.isPending ? (
 							<IconLoader className="animate-spin" />
