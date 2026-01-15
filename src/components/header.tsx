@@ -16,11 +16,11 @@ export default function Header() {
 	};
 
 	return (
-		<header className="flex items-center justify-between py-4 border-b">
+		<header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 py-4 border-b">
 			<Link to="/">
 				<h1 className="text-lg font-semibold">refeat</h1>
 			</Link>
-			<div className="flex items-center gap-4">
+			<div className="flex items-center gap-2 sm:gap-4 flex-wrap">
 				<ThemeSwitcher />
 				<CreateTrackerButton />
 				<Button type="button" variant="secondary" onClick={logout}>

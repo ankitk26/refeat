@@ -5,6 +5,22 @@ import { api } from "convex/_generated/api";
 import { Id } from "convex/_generated/dataModel";
 import { groupLogsByYearAndMonth } from "@/lib/group-logs-by-year-month";
 import LogStatusByDay from "./log-status-by-day";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+
+const MONTH_NAMES = [
+	"January",
+	"February",
+	"March",
+	"April",
+	"May",
+	"June",
+	"July",
+	"August",
+	"September",
+	"October",
+	"November",
+	"December",
+];
 
 export default function TrackerLogsByMonth() {
 	const { trackerId } = useParams({ from: "/_auth/trackers/$trackerId" });
@@ -15,24 +31,66 @@ export default function TrackerLogsByMonth() {
 	);
 
 	if (isPending || !logs) {
-		return <p>Loading...</p>;
+		return (
+			<div className="space-y-4">
+				<div className="h-32 bg-muted/50 rounded-lg animate-pulse" />
+				<div className="h-32 bg-muted/50 rounded-lg animate-pulse" />
+			</div>
+		);
+	}
+
+	if (logs.length === 0) {
+		return (
+			<Card>
+				<CardContent className="py-8 text-center">
+					<p className="text-muted-foreground text-sm">
+						No logs yet. Start tracking to see your progress!
+					</p>
+				</CardContent>
+			</Card>
+		);
 	}
 
 	const sortedLogsGroupedByYearMonth = groupLogsByYearAndMonth(logs);
 
 	return (
-		<div>
+		<div className="space-y-8 mt-8">
 			{sortedLogsGroupedByYearMonth.map((yearlyLogs) => (
-				<div>
-					<h1>{yearlyLogs.year}</h1>
-					{yearlyLogs.months.map((monthlyLogs) => (
-						<div>
-							<h1>Month #{monthlyLogs.month}</h1>
-							<div className="flex items-center flex-wrap gap-1.5">
-								<LogStatusByDay logs={monthlyLogs.logs} />
-							</div>
-						</div>
-					))}
+				<div key={yearlyLogs.year} className="space-y-4">
+					<h2 className="text-lg font-semibold text-foreground/80">
+						{yearlyLogs.year}
+					</h2>
+					<div className="space-y-3">
+						{yearlyLogs.months.map((monthlyLogs) => {
+							const accomplishedCount = monthlyLogs.logs.filter(
+								(log) => log.isAccomplished
+							).length;
+							const totalDays = monthlyLogs.logs.length;
+							const percentage = Math.round(
+								(accomplishedCount / totalDays) * 100
+							);
+
+							return (
+								<Card key={monthlyLogs.month} size="sm">
+									<CardHeader>
+										<div className="flex items-center justify-between">
+											<CardTitle className="text-sm font-medium">
+												{MONTH_NAMES[monthlyLogs.month - 1]}
+											</CardTitle>
+											<span className="text-xs text-muted-foreground font-medium">
+												{accomplishedCount}/{totalDays} ({percentage}%)
+											</span>
+										</div>
+									</CardHeader>
+									<CardContent>
+										<div className="flex items-center flex-wrap gap-1.5">
+											<LogStatusByDay logs={monthlyLogs.logs} />
+										</div>
+									</CardContent>
+								</Card>
+							);
+						})}
+					</div>
 				</div>
 			))}
 		</div>

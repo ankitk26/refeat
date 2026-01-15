@@ -1,4 +1,3 @@
-import { IconCircleFilled } from "@tabler/icons-react";
 import { Doc } from "convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
 
@@ -8,12 +7,19 @@ type Props = {
 
 export default function LogStatusByDay({ logs }: Props) {
 	return logs.map((log) => (
-		<IconCircleFilled
+		<div
 			key={log._id}
 			className={cn(
-				"size-2.5",
-				log.isAccomplished ? "text-emerald-500" : "text-red-500"
+				"size-2.5 rounded-full transition-all duration-200",
+				log.isAccomplished
+					? "bg-emerald-500 dark:bg-emerald-400 ring-1 ring-emerald-500/20 dark:ring-emerald-400/30"
+					: "bg-muted-foreground/30 dark:bg-muted-foreground/20 ring-1 ring-border/50"
 			)}
+			title={
+				log.isAccomplished
+					? `Day ${log.userDay} - Accomplished`
+					: `Day ${log.userDay} - Not accomplished`
+			}
 		/>
 	));
 }
