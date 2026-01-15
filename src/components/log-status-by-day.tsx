@@ -12,7 +12,7 @@ export default function LogStatusByDay({ logs }: Props) {
 			className={cn(
 				"size-2.5 rounded-full transition-all duration-200",
 				log.isAccomplished
-					? "bg-emerald-500 dark:bg-emerald-400 ring-1 ring-emerald-500/20 dark:ring-emerald-400/30"
+					? "bg-primary ring-1 ring-primary/20"
 					: "bg-muted-foreground/30 dark:bg-muted-foreground/20 ring-1 ring-border/50"
 			)}
 			title={

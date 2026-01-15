@@ -126,7 +126,7 @@ export default function TrackerCardItem({ tracker }: Props) {
 							type="button"
 							variant="default"
 							size="sm"
-							className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600 hover:border-emerald-700"
+							className="flex-1"
 							onClick={() => updateLogStatus(true)}
 						>
 							Completed
