@@ -1,5 +1,5 @@
 import { ConvexError, v } from "convex/values";
-import { api, internal } from "./_generated/api";
+import { internal } from "./_generated/api";
 import { mutation, query } from "./_generated/server";
 
 export const create = mutation({
@@ -115,6 +115,9 @@ export const deleteById = mutation({
 		}
 
 		await ctx.db.delete(args.trackerId);
+		await ctx.runMutation(internal.trackerLogs.deleteByTracker, {
+			trackerId: args.trackerId,
+		});
 	},
 });
 

@@ -327,3 +327,16 @@ export const backfillLogs = mutation({
 		return { created: logsToCreate.length };
 	},
 });
+
+export const deleteByTracker = internalMutation({
+	args: {
+		trackerId: v.id("trackers"),
+	},
+	handler: async (ctx, args) => {
+		const trackerLogs = await ctx.db
+			.query("trackerLogs")
+			.withIndex("by_tracker", (q) => q.eq("trackerId", args.trackerId))
+			.collect();
+		await Promise.all(trackerLogs.map((log) => ctx.db.delete(log._id)));
+	},
+});
