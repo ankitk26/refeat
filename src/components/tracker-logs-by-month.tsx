@@ -6,6 +6,7 @@ import { Id } from "convex/_generated/dataModel";
 import { groupLogsByYearAndMonth } from "@/lib/group-logs-by-year-month";
 import LogStatusByDay from "./log-status-by-day";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Skeleton } from "./ui/skeleton";
 
 const MONTH_NAMES = [
 	"January",
@@ -32,9 +33,22 @@ export default function TrackerLogsByMonth() {
 
 	if (isPending || !logs) {
 		return (
-			<div className="space-y-4">
-				<div className="h-32 bg-muted/50 rounded-lg animate-pulse" />
-				<div className="h-32 bg-muted/50 rounded-lg animate-pulse" />
+			<div className="space-y-8 mt-8">
+				<div className="space-y-4">
+					<Skeleton className="h-6 w-16" />
+					<Card size="sm">
+						<CardHeader>
+							<Skeleton className="h-5 w-32" />
+						</CardHeader>
+						<CardContent>
+							<div className="flex items-center flex-wrap gap-1.5">
+								{[...Array(10)].map((_, i) => (
+									<Skeleton key={i} className="h-6 w-6 rounded-full" />
+								))}
+							</div>
+						</CardContent>
+					</Card>
+				</div>
 			</div>
 		);
 	}

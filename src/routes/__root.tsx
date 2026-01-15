@@ -2,6 +2,7 @@ import type { ConvexQueryClient } from "@convex-dev/react-query";
 import type { QueryClient } from "@tanstack/react-query";
 import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
 import { TanStackDevtools } from "@tanstack/react-devtools";
+import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
 import {
 	HeadContent,
 	Outlet,
@@ -95,6 +96,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 						{
 							name: "Tanstack Router",
 							render: <TanStackRouterDevtoolsPanel />,
+						},
+						{
+							name: "Tanstack Query",
+							render: <ReactQueryDevtoolsPanel />,
 						},
 					]}
 				/>
