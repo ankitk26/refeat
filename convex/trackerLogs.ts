@@ -73,7 +73,7 @@ export const create = internalMutation({
 	},
 });
 
-export const list = query({
+export const listByMonth = query({
 	args: {
 		range: v.union(v.literal("month"), v.literal("year")),
 		month: v.number(),
@@ -121,6 +121,42 @@ export const list = query({
 			.withIndex("by_tracker_year", (q) =>
 				q.eq("trackerId", args.trackerId).eq("userYear", args.year)
 			)
+			.collect();
+
+		return logs;
+	},
+});
+
+export const listByTracker = query({
+	args: {
+		trackerId: v.id("trackers"),
+	},
+	handler: async (ctx, args) => {
+		const auth = await ctx.auth.getUserIdentity();
+		if (!auth) {
+			throw new ConvexError("Invalid request");
+		}
+
+		const tracker = await ctx.db.get(args.trackerId);
+		if (!tracker) {
+			throw new ConvexError("Invalid request");
+		}
+
+		const user = await ctx.db
+			.query("users")
+			.withIndex("by_authId", (q) => q.eq("authId", auth.subject))
+			.first();
+		if (!user) {
+			throw new ConvexError("Invalid request");
+		}
+
+		if (tracker.creatorId !== user._id) {
+			throw new ConvexError("Invalid request");
+		}
+
+		const logs = await ctx.db
+			.query("trackerLogs")
+			.withIndex("by_tracker", (q) => q.eq("trackerId", args.trackerId))
 			.collect();
 
 		return logs;
