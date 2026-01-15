@@ -85,7 +85,10 @@ export default function TrackerCardItem({ tracker }: Props) {
 
 	return (
 		<>
-			<Card key={tracker._id} className="col-span-1 w-full">
+			<Card
+				key={tracker._id}
+				className="col-span-1 w-full h-full flex flex-col"
+			>
 				<CardHeader>
 					<Link to="/trackers/$trackerId" params={{ trackerId: tracker._id }}>
 						<CardTitle>{tracker.name}</CardTitle>
@@ -119,9 +122,11 @@ export default function TrackerCardItem({ tracker }: Props) {
 						</DropdownMenu>
 					</CardAction>
 				</CardHeader>
-				<CardContent className="space-y-4">
-					<TrackerMonthStatus trackerId={tracker._id} />
-					<div className="flex gap-2 pt-4 border-t">
+				<CardContent className="flex flex-col flex-1">
+					<div className="flex-1">
+						<TrackerMonthStatus trackerId={tracker._id} />
+					</div>
+					<div className="flex gap-2 pt-4 border-t mt-auto">
 						<Button
 							type="button"
 							variant="default"

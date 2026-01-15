@@ -21,16 +21,16 @@ export default function TrackerMonthStatus(props: Props) {
 
 	if (isPending) {
 		return (
-			<div className="flex items-center flex-wrap gap-1.5">
+			<div className="flex items-start flex-wrap gap-1.5 mb-4">
 				{[...Array(7)].map((_, i) => (
-					<Skeleton key={i} className="h-6 w-6 rounded-full" />
+					<Skeleton key={i} className="h-3 w-3 rounded-full" />
 				))}
 			</div>
 		);
 	}
 
 	return (
-		<div className="flex items-center flex-wrap gap-1.5">
+		<div className="flex items-start flex-wrap gap-1.5 mb-4">
 			<LogStatusByDay logs={logs ?? []} />
 		</div>
 	);

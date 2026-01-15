@@ -1,3 +1,4 @@
+import { IconLogout } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { authClient } from "@/lib/auth-client";
 import CreateTrackerButton from "./create-tracker-button";
@@ -24,6 +25,7 @@ export default function Header() {
 				<ThemeSwitcher />
 				<CreateTrackerButton />
 				<Button type="button" variant="secondary" onClick={logout}>
+					<IconLogout />
 					Logout
 				</Button>
 			</div>
