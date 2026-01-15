@@ -7,19 +7,30 @@ type Props = {
 
 export default function LogStatusByDay({ logs }: Props) {
 	return logs.map((log) => (
-		<div
+		<svg
 			key={log._id}
-			className={cn(
-				"size-2.5 rounded-full transition-all duration-200",
-				log.isAccomplished
-					? "bg-primary ring-1 ring-primary/20"
-					: "bg-muted-foreground/30 dark:bg-muted-foreground/20 ring-1 ring-border/50"
-			)}
-			title={
+			width="14"
+			height="14"
+			viewBox="0 0 14 14"
+			className="shrink-0"
+			aria-label={
 				log.isAccomplished
 					? `Day ${log.userDay} - Accomplished`
 					: `Day ${log.userDay} - Not accomplished`
 			}
-		/>
+		>
+			<circle
+				cx="7"
+				cy="7"
+				r="5"
+				className={cn(
+					"transition-all duration-200",
+					log.isAccomplished
+						? "fill-primary stroke-primary/20"
+						: "fill-muted-foreground/30 dark:fill-muted-foreground/20 stroke-border/50"
+				)}
+				strokeWidth="2"
+			/>
+		</svg>
 	));
 }
