@@ -7,13 +7,14 @@
   ],
   "type": "module",
   "scripts": {
-    "dev": "pnpm -r dev",
+    "dev": "pnpm -r --parallel dev",
     "build": "pnpm -r --if-present build",
     "check-types": "pnpm -r check-types",
     "dev:web": "pnpm --filter web dev",
     "dev:server": "pnpm --filter @refeat/backend dev",
     "dev:setup": "pnpm --filter @refeat/backend dev:setup",
-    "check": "oxlint && oxfmt --write"
+    "check": "oxlint && oxfmt --write",
+    "fmt": "oxfmt --write"
   },
   "dependencies": {
     "@refeat/env": "workspace:*",

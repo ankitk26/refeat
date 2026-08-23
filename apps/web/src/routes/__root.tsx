@@ -31,7 +31,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "refeat — minimal habit tracker" },
+      { title: "refeat — Where calm meets consistency" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -43,7 +43,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
       },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght@9..144,0,600;9..144,0,700;9..144,1,600&family=Geist:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap",
       },
     ],
   }),

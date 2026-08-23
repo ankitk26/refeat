@@ -1,9 +1,19 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { getCurrentProfileOrThrow } from "./model/profiles";
+
+async function requireTrackerOwner(ctx: any, trackerId: any) {
+  const profileId = await getCurrentProfileOrThrow(ctx);
+  const tracker = await ctx.db.get(trackerId);
+  if (!tracker) throw new Error("Tracker not found");
+  if (tracker.profileId !== profileId) throw new Error("Forbidden: not owner");
+  return { profileId, tracker };
+}
 
 export const listByTracker = query({
   args: { trackerId: v.id("trackers") },
   handler: async (ctx, args) => {
+    await requireTrackerOwner(ctx, args.trackerId);
     return await ctx.db
       .query("completions")
       .withIndex("by_tracker", (q) => q.eq("trackerId", args.trackerId))
@@ -14,6 +24,7 @@ export const listByTracker = query({
 export const getForDate = query({
   args: { trackerId: v.id("trackers"), date: v.string() },
   handler: async (ctx, args) => {
+    await requireTrackerOwner(ctx, args.trackerId);
     return await ctx.db
       .query("completions")
       .withIndex("by_tracker_date", (q) => q.eq("trackerId", args.trackerId).eq("date", args.date))
@@ -24,15 +35,13 @@ export const getForDate = query({
 export const toggle = mutation({
   args: { trackerId: v.id("trackers"), date: v.string() },
   handler: async (ctx, args) => {
+    await requireTrackerOwner(ctx, args.trackerId);
     const existing = await ctx.db
       .query("completions")
       .withIndex("by_tracker_date", (q) => q.eq("trackerId", args.trackerId).eq("date", args.date))
       .unique();
 
     if (existing) {
-      // toggle done -> if was done, remove (means undo), else set done
-      // For simplicity, delete to mean not done, or if we store done boolean, toggle
-      // We'll delete to indicate not done, so failed state will be inferred
       await ctx.db.delete(existing._id);
       return null;
     }
@@ -49,6 +58,7 @@ export const toggle = mutation({
 export const setDone = mutation({
   args: { trackerId: v.id("trackers"), date: v.string(), done: v.boolean() },
   handler: async (ctx, args) => {
+    await requireTrackerOwner(ctx, args.trackerId);
     const existing = await ctx.db
       .query("completions")
       .withIndex("by_tracker_date", (q) => q.eq("trackerId", args.trackerId).eq("date", args.date))

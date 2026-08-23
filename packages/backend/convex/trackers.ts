@@ -1,29 +1,36 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { authComponent } from "./auth";
+import { getCurrentProfileOrThrow } from "./model/profiles";
+
+async function requireProfile(ctx: any) {
+  return await getCurrentProfileOrThrow(ctx);
+}
+
+async function requireTrackerOwner(ctx: any, trackerId: any) {
+  const profileId = await requireProfile(ctx);
+  const tracker = await ctx.db.get(trackerId);
+  if (!tracker) throw new Error("Tracker not found");
+  if (tracker.profileId !== profileId) throw new Error("Forbidden: not owner");
+  return { profileId, tracker };
+}
 
 export const list = query({
   args: {},
   handler: async (ctx) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
-    // if authed, filter by userId; otherwise return all (for dev)
-    if (user) {
-      const own = await ctx.db
-        .query("trackers")
-        .withIndex("by_user", (q) => q.eq("userId", user._id))
-        .order("desc")
-        .collect();
-      // also include anon? no
-      return own;
-    }
-    return await ctx.db.query("trackers").order("desc").collect();
+    const profileId = await requireProfile(ctx);
+    return await ctx.db
+      .query("trackers")
+      .withIndex("by_profile", (q) => q.eq("profileId", profileId))
+      .order("desc")
+      .collect();
   },
 });
 
 export const get = query({
   args: { id: v.id("trackers") },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.id);
+    const { tracker } = await requireTrackerOwner(ctx, args.id);
+    return tracker;
   },
 });
 
@@ -35,13 +42,15 @@ export const create = mutation({
     frequency: v.array(v.number()),
   },
   handler: async (ctx, args) => {
-    const user = await authComponent.safeGetAuthUser(ctx);
+    const profileId = await requireProfile(ctx);
+    if (!args.title.trim()) throw new Error("Title required");
+    if (args.frequency.length === 0) throw new Error("Frequency required");
     const id = await ctx.db.insert("trackers", {
       title: args.title.trim(),
       startDate: args.startDate,
       targetDate: args.targetDate,
       frequency: args.frequency,
-      userId: user?._id,
+      profileId,
       createdAt: Date.now(),
     });
     return id;
@@ -57,26 +66,33 @@ export const update = mutation({
     frequency: v.optional(v.array(v.number())),
   },
   handler: async (ctx, args) => {
-    const { id, ...rest } = args;
+    const { tracker } = await requireTrackerOwner(ctx, args.id);
     const patch: Record<string, unknown> = {};
-    if (rest.title !== undefined) patch.title = rest.title.trim();
-    if (rest.startDate !== undefined) patch.startDate = rest.startDate;
-    if (rest.targetDate !== undefined) patch.targetDate = rest.targetDate;
-    if (rest.frequency !== undefined) patch.frequency = rest.frequency;
-    await ctx.db.patch(id, patch);
-    return id;
+    if (args.title !== undefined) {
+      if (!args.title.trim()) throw new Error("Title required");
+      patch.title = args.title.trim();
+    }
+    if (args.startDate !== undefined) patch.startDate = args.startDate;
+    if (args.targetDate !== undefined) patch.targetDate = args.targetDate;
+    if (args.frequency !== undefined) {
+      if (args.frequency.length === 0) throw new Error("Frequency required");
+      patch.frequency = args.frequency;
+    }
+    await ctx.db.patch(tracker._id, patch);
+    return tracker._id;
   },
 });
 
 export const remove = mutation({
   args: { id: v.id("trackers") },
   handler: async (ctx, args) => {
-    // delete completions first
+    const { tracker } = await requireTrackerOwner(ctx, args.id);
     const comps = await ctx.db
       .query("completions")
-      .withIndex("by_tracker", (q) => q.eq("trackerId", args.id))
+      .withIndex("by_tracker", (q) => q.eq("trackerId", tracker._id))
       .collect();
     for (const c of comps) await ctx.db.delete(c._id);
-    await ctx.db.delete(args.id);
+    await ctx.db.delete(tracker._id);
+    return null;
   },
 });

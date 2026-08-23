@@ -12,21 +12,21 @@ import type * as auth from "../auth.js";
 import type * as completions from "../completions.js";
 import type * as healthCheck from "../healthCheck.js";
 import type * as http from "../http.js";
+import type * as model_profiles from "../model/profiles.js";
 import type * as privateData from "../privateData.js";
+import type * as profiles from "../profiles.js";
 import type * as trackers from "../trackers.js";
 
-import type {
-  ApiFromModules,
-  FilterApi,
-  FunctionReference,
-} from "convex/server";
+import type { ApiFromModules, FilterApi, FunctionReference } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   completions: typeof completions;
   healthCheck: typeof healthCheck;
   http: typeof http;
+  "model/profiles": typeof model_profiles;
   privateData: typeof privateData;
+  profiles: typeof profiles;
   trackers: typeof trackers;
 }>;
 
@@ -38,10 +38,7 @@ declare const fullApi: ApiFromModules<{
  * const myFunctionReference = api.myModule.myFunction;
  * ```
  */
-export declare const api: FilterApi<
-  typeof fullApi,
-  FunctionReference<any, "public">
->;
+export declare const api: FilterApi<typeof fullApi, FunctionReference<any, "public">>;
 
 /**
  * A utility for referencing Convex functions in your app's internal API.
@@ -51,10 +48,7 @@ export declare const api: FilterApi<
  * const myFunctionReference = internal.myModule.myFunction;
  * ```
  */
-export declare const internal: FilterApi<
-  typeof fullApi,
-  FunctionReference<any, "internal">
->;
+export declare const internal: FilterApi<typeof fullApi, FunctionReference<any, "internal">>;
 
 export declare const components: {
   betterAuth: import("@convex-dev/better-auth/_generated/component.js").ComponentApi<"betterAuth">;
