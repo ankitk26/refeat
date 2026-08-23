@@ -54,8 +54,20 @@ function createAuth(ctx: GenericCtx<DataModel>) {
 		trustedOrigins: [siteUrl],
 		database: authComponent.adapter(ctx),
 		emailAndPassword: {
-			enabled: true,
-			requireEmailVerification: false,
+			enabled: false,
+		},
+		socialProviders: {
+			google: {
+				clientId: process.env.GOOGLE_CLIENT_ID as string,
+				clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+				accessType: "offline",
+				prompt: "select_account",
+			},
+		},
+		session: {
+			cookieCache: { enabled: true, maxAge: 5 * 60 },
+			expiresIn: 60 * 60 * 24 * 7,
+			updateAge: 60 * 60 * 24,
 		},
 		plugins: [
 			convex({

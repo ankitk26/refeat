@@ -2,11 +2,17 @@ import { convexQuery } from "@convex-dev/react-query";
 import { api } from "@refeat/backend/convex/_generated/api";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useConvex } from "convex/react";
-import { useMemo, useState } from "react";
+import {
+	Authenticated,
+	AuthLoading,
+	Unauthenticated,
+	useConvex,
+	useMutation as useConvexMutation,
+} from "convex/react";
+import { useEffect, useMemo, useState } from "react";
+import LoginForm from "@/components/login-form";
 import {
 	computeCurrentStreak,
-	computeMonthStats,
 	fromISO,
 	getDayStatus,
 	getMonthDays,
@@ -14,8 +20,28 @@ import {
 } from "@/lib/dates";
 
 export const Route = createFileRoute("/")({
-	component: Home,
+	component: HomeGate,
 });
+
+function HomeGate() {
+	return (
+		<>
+			<Authenticated>
+				<Home />
+			</Authenticated>
+			<Unauthenticated>
+				<div className="grid min-h-svh place-items-center bg-background px-4 py-10">
+					<LoginForm />
+				</div>
+			</Unauthenticated>
+			<AuthLoading>
+				<div className="grid min-h-svh place-items-center bg-background font-mono text-sm text-muted-foreground">
+					Loading...
+				</div>
+			</AuthLoading>
+		</>
+	);
+}
 
 const DAYS = [
 	{ label: "Mon", v: 1 },
@@ -32,11 +58,14 @@ function Home() {
 	const trackers = trackersQuery.data ?? [];
 	const [showAdd, setShowAdd] = useState(false);
 	const today = useMemo(() => new Date(), []);
+	const ensureProfile = useConvexMutation(api.profiles.ensureMyProfile);
+	useEffect(() => {
+		ensureProfile({}).catch(() => {});
+	}, [ensureProfile]);
 
 	return (
 		<div className="min-h-svh bg-background">
 			<div className="mx-auto max-w-xl px-4 pb-10 md:px-6">
-				{/* header - only logo + action, no nav fluff */}
 				<header className="flex items-center justify-between py-4">
 					<div className="flex items-center gap-2">
 						<span className="text-sm">🌲</span>
@@ -46,18 +75,17 @@ function Home() {
 					</div>
 					<button
 						onClick={() => setShowAdd(true)}
-						className="rounded-full bg-primary px-4 py-1.5 font-mono text-xs font-medium text-primary-foreground transition hover:bg-primary/90"
+						className="rounded-full bg-primary px-4 py-1.5 font-mono text-xs font-medium text-primary-foreground hover:bg-primary/90"
 					>
 						+ New
 					</button>
 				</header>
 
-				{/* minimal hero — just context, no marketing */}
 				<div className="pt-1">
 					<h1 className="font-display text-2xl leading-none font-bold tracking-tight text-foreground">
 						Your habits
 					</h1>
-					<p className="mt-1 font-mono text-xs leading-relaxed text-muted-foreground">
+					<p className="mt-1 font-mono text-xs text-muted-foreground">
 						{today.toLocaleDateString("en-US", {
 							weekday: "long",
 							month: "long",
@@ -67,24 +95,6 @@ function Home() {
 					</p>
 				</div>
 
-				{/* legend — one line, to the point */}
-				<div className="mt-4 flex items-center gap-3 font-mono text-xs text-muted-foreground">
-					<span className="inline-flex items-center gap-1">
-						<span className="h-2.5 w-2.5 rounded-sm bg-sage" /> done
-					</span>
-					<span className="inline-flex items-center gap-1">
-						<span className="h-2.5 w-2.5 rounded-sm bg-primary" /> missed
-					</span>
-					<span className="inline-flex items-center gap-1">
-						<span className="h-2.5 w-2.5 rounded-sm border border-border bg-card" />{" "}
-						rest
-					</span>
-					<span className="ml-auto hidden text-muted-foreground md:inline">
-						tap square to toggle
-					</span>
-				</div>
-
-				{/* trackers */}
 				<div className="mt-5 grid gap-3">
 					{trackersQuery.isLoading &&
 						[0, 1].map((i) => (
@@ -93,7 +103,6 @@ function Home() {
 								className="h-28 animate-pulse rounded-xl bg-secondary"
 							/>
 						))}
-
 					{trackers.length === 0 && !trackersQuery.isLoading && (
 						<div className="rounded-xl border border-dashed border-border/60 bg-card/70 p-6 text-center">
 							<p className="font-display text-sm font-semibold text-foreground">
@@ -110,13 +119,11 @@ function Home() {
 							</button>
 						</div>
 					)}
-
 					{trackers.map((t: any) => (
 						<TrackerCard key={t._id} tracker={t} />
 					))}
 				</div>
 			</div>
-
 			{showAdd && <AddTrackerDialog onClose={() => setShowAdd(false)} />}
 		</div>
 	);
@@ -135,82 +142,51 @@ function TrackerCard({ tracker }: { tracker: any }) {
 	const year = today.getFullYear();
 	const month = today.getMonth();
 	const days = useMemo(() => getMonthDays(year, month), [year, month]);
-	const stats = useMemo(
-		() => computeMonthStats(days, tracker, set, today),
-		[days, tracker, set, today],
-	);
 	const streak = useMemo(
 		() => computeCurrentStreak(tracker, set, today),
 		[tracker, set, today],
 	);
-	const pct = stats.required
-		? Math.round((stats.done / stats.required) * 100)
-		: 0;
 
 	return (
 		<Link
 			to="/trackers/$id"
 			params={{ id: tracker._id }}
-			className="block rounded-xl border border-border/40 bg-card p-3.5 shadow-sm transition hover:shadow-md"
+			className="block rounded-xl border border-border/40 bg-card p-3 shadow-sm"
 		>
-			<div className="flex items-start justify-between gap-2">
-				<h3 className="truncate pr-2 font-display text-sm leading-none font-bold text-foreground">
+			<div className="flex items-center justify-between gap-2">
+				<h3 className="truncate font-display text-sm font-bold text-foreground">
 					{tracker.title}
 				</h3>
-				<span className="shrink-0 rounded-full bg-secondary px-2 py-1 font-mono text-xs font-medium text-foreground">
-					{streak} streak • {stats.done}/{stats.required}
+				<span className="shrink-0 rounded-full bg-secondary px-2.5 py-1 font-mono text-xs text-foreground">
+					{streak} streak
 				</span>
 			</div>
-
-			<div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-secondary">
-				<div className="h-full bg-sage" style={{ width: `${pct}%` }} />
+			<div className="mt-3 grid grid-cols-14 gap-1.5">
+				{days.map((d) => {
+					const status = getDayStatus(d, tracker, set, today);
+					const isToday = toISO(d) === toISO(today);
+					return (
+						<div
+							key={toISO(d)}
+							className={[
+								"flex h-7 w-7 items-center justify-center rounded-full font-mono text-xs",
+								status === "done"
+									? "bg-sage text-white"
+									: status === "failed"
+										? "bg-primary text-white"
+										: status === "not_required"
+											? "bg-secondary text-muted-foreground/40"
+											: "bg-card border border-border text-muted-foreground",
+								isToday
+									? "ring-1 ring-primary/40 ring-offset-1 ring-offset-card"
+									: "",
+							].join(" ")}
+						>
+							{d.getDate()}
+						</div>
+					);
+				})}
 			</div>
-
-			<div className="mt-2.5 grid grid-cols-7 gap-1">
-				{["M", "T", "W", "T", "F", "S", "S"].map((w, i) => (
-					<div
-						key={i}
-						className="text-center font-mono text-xs text-muted-foreground/60"
-					>
-						{w}
-					</div>
-				))}
-			</div>
-			{(() => {
-				const first = new Date(year, month, 1);
-				const offset = (first.getDay() + 6) % 7;
-				const cells: (Date | null)[] = [];
-				for (let i = 0; i < offset; i++) cells.push(null);
-				for (const d of days) cells.push(d);
-				while (cells.length % 7 !== 0) cells.push(null);
-				return (
-					<div className="mt-1 grid grid-cols-7 gap-1">
-						{cells.map((d, idx) => {
-							if (!d) return <div key={idx} className="aspect-square" />;
-							const status = getDayStatus(d, tracker, set, today);
-							const isToday = toISO(d) === toISO(today);
-							return (
-								<div
-									key={idx}
-									className={[
-										"flex aspect-square items-center justify-center rounded-lg border text-xs font-mono",
-										status === "done"
-											? "border-sage bg-sage text-white"
-											: status === "failed"
-												? "border-primary bg-primary text-white"
-												: status === "not_required"
-													? "border-secondary bg-secondary text-muted-foreground/60"
-													: "border-border/40 bg-white text-muted-foreground",
-										isToday ? "ring-1 ring-primary/30" : "",
-									].join(" ")}
-								>
-									{d.getDate()}
-								</div>
-							);
-						})}
-					</div>
-				);
-			})()}
 		</Link>
 	);
 }
@@ -279,18 +255,17 @@ function AddTrackerDialog({ onClose }: { onClose: () => void }) {
 							type="date"
 							value={targetDate}
 							onChange={(e) => setTargetDate(e.target.value)}
-							placeholder="Target"
 							className="rounded-xl border border-border bg-white px-2.5 py-2 text-sm outline-none"
 						/>
 					</div>
-					<div className="flex flex-wrap gap-1.5">
+					<div className="grid grid-cols-7 gap-1.5">
 						{DAYS.map((d) => (
 							<button
 								key={d.v}
 								type="button"
 								onClick={() => toggleDay(d.v)}
 								className={[
-									"rounded-full border px-2.5 py-1.5 text-xs font-mono",
+									"rounded-full border py-2 font-mono text-xs",
 									freq.includes(d.v)
 										? "border-foreground bg-foreground text-white"
 										: "border-border bg-white text-muted-foreground",
