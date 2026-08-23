@@ -1,0 +1,3 @@
+{
+  "extends": "@refeat/config/tsconfig.base.json"
+}
