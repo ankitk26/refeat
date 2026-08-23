@@ -1,32 +1,32 @@
 {
-  "name": "refeat",
-  "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
-  "type": "module",
-  "scripts": {
-    "dev": "pnpm -r --parallel dev",
-    "build": "pnpm -r --if-present build",
-    "check-types": "pnpm -r check-types",
-    "dev:web": "pnpm --filter web dev",
-    "dev:server": "pnpm --filter @refeat/backend dev",
-    "dev:setup": "pnpm --filter @refeat/backend dev:setup",
-    "check": "oxlint && oxfmt --write",
-    "fmt": "oxfmt --write"
-  },
-  "dependencies": {
-    "@refeat/env": "workspace:*",
-    "dotenv": "catalog:",
-    "zod": "catalog:"
-  },
-  "devDependencies": {
-    "@refeat/config": "workspace:*",
-    "@types/node": "catalog:",
-    "oxfmt": "^0.63.0",
-    "oxlint": "^1.78.0",
-    "typescript": "catalog:"
-  },
-  "packageManager": "pnpm@10.26.0"
+	"name": "refeat",
+	"private": true,
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
+	"type": "module",
+	"scripts": {
+		"dev": "pnpm -r --parallel dev",
+		"build": "pnpm -r --if-present build",
+		"check-types": "pnpm -r check-types",
+		"dev:web": "pnpm --filter web dev",
+		"dev:server": "pnpm --filter @refeat/backend dev",
+		"dev:setup": "pnpm --filter @refeat/backend dev:setup",
+		"check": "oxlint && oxfmt --write",
+		"fmt": "oxfmt --write"
+	},
+	"dependencies": {
+		"@refeat/env": "workspace:*",
+		"dotenv": "catalog:",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@refeat/config": "workspace:*",
+		"@types/node": "catalog:",
+		"oxfmt": "^0.63.0",
+		"oxlint": "^1.78.0",
+		"typescript": "catalog:"
+	},
+	"packageManager": "pnpm@10.26.0"
 }
