@@ -7,7 +7,7 @@
 	"scripts": {
 		"dev": "convex dev",
 		"dev:setup": "convex dev --configure --until-success",
-		"deploy": "convex deploy"
+		"deploy:convex": "convex deploy"
 	},
 	"dependencies": {
 		"@convex-dev/better-auth": "catalog:",

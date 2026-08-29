@@ -182,25 +182,22 @@ function Home() {
 						))}
 					{trackers.length === 0 && !trackersQuery.isLoading && (
 						<div
-							className="panel reveal overflow-hidden"
+							className="panel reveal p-6 text-center"
 							style={{ animationDelay: "120ms" }}
 						>
-							<PixelScene night={isDark} />
-							<div className="border-t-2 border-pine p-6 text-center">
-								<p className="font-display text-4xl text-foreground">
-									Your quest log is empty
-								</p>
-								<p className="mx-auto mt-2 max-w-[34ch] text-sm text-muted-foreground">
-									Accept a quest, come back each day to complete it, and watch
-									the streak grow.
-								</p>
-								<button
-									onClick={() => setShowAdd(true)}
-									className="btn-pixel mt-5 bg-lime text-pine hover:bg-lime-deep"
-								>
-									⚔ accept your first quest
-								</button>
-							</div>
+							<p className="font-display text-4xl text-foreground">
+								Your quest log is empty
+							</p>
+							<p className="mx-auto mt-2 max-w-[34ch] text-sm text-muted-foreground">
+								Accept a quest, come back each day to complete it, and watch the
+								streak grow.
+							</p>
+							<button
+								onClick={() => setShowAdd(true)}
+								className="btn-pixel mt-5 bg-lime text-pine hover:bg-lime-deep"
+							>
+								⚔ accept your first quest
+							</button>
 						</div>
 					)}
 					{trackers.map((t, i) => (

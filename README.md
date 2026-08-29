@@ -91,7 +91,9 @@ refeat/
 - `pnpm run dev:setup`: Setup and configure your Convex project
 - `pnpm run check-types`: Check TypeScript types across all apps
 - `pnpm run check`: Run Oxlint and Oxfmt
-- `pnpm run deploy`: Deploy backend (Convex) + frontend (Cloudflare Workers)
+- `pnpm run deploy:all`: Deploy backend (Convex) + frontend (Cloudflare Workers)
+
+> **Note:** the scripts are named `deploy:all` / `deploy:cf` / `deploy:convex` because plain `pnpm deploy` is a built-in pnpm command and would shadow a script named `deploy`.
 
 ## Deployment
 
@@ -107,7 +109,7 @@ pnpm --filter web exec wrangler login
 Deploy everything:
 
 ```bash
-pnpm run deploy
+pnpm run deploy:all
 ```
 
 This runs `convex deploy` (pushes backend functions to the production Convex deployment) and then `vite build && wrangler deploy` for the web app.
@@ -150,4 +152,6 @@ npx convex env set SITE_URL https://<your-worker>.workers.dev --prod
 Then in [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials) (OAuth client), add:
 
 - **Authorized JavaScript origin**: `https://<your-worker>.workers.dev`
-- **Authorized redirect URI**: `https://<prod-convex-deployment>.convex.site/api/auth/callback/google` (the prod deployment's `.convex.site` URL — it differs from the dev one)
+- **Authorized redirect URI**: `https://<your-worker>.workers.dev/api/auth/callback/google`
+
+  The callback goes through your **web app's** `/api/auth/*` route (`apps/web/src/routes/api/auth/$.ts`), which runs on the Worker and proxies to Convex — so the redirect URI is derived from `SITE_URL`, not from the `.convex.site` domain. The `.convex.site` URL is only used internally for worker → Convex proxying.
