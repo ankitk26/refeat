@@ -70,6 +70,12 @@ function RootDocument() {
 			<html lang="en">
 				<head>
 					<HeadContent />
+					{/* restore theme before first paint to avoid a light-mode flash */}
+					<script
+						dangerouslySetInnerHTML={{
+							__html: `(function(){try{var stored=localStorage.getItem("refeat-theme");var prefersDark=window.matchMedia("(prefers-color-scheme: dark)").matches;var isDark=stored?stored==="dark":prefersDark;document.documentElement.classList.toggle("dark",isDark);}catch(e){}})();`,
+						}}
+					/>
 				</head>
 				<body className="min-h-svh antialiased">
 					<Outlet />

@@ -13,7 +13,9 @@ import { LogOut } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import LoginForm from "@/components/login-form";
 import PixelScene from "@/components/pixel-scene";
+import ThemeToggle from "@/components/theme-toggle";
 import { authClient } from "@/lib/auth-client";
+import { useDarkMode } from "@/lib/dark-mode";
 import {
 	computeCurrentStreak,
 	getDayStatus,
@@ -68,6 +70,7 @@ function isSameDaySet(first: number[], second: number[]) {
 }
 
 function Home() {
+	const [isDark] = useDarkMode();
 	const trackersQuery = useQuery(convexQuery(api.trackers.list, {}));
 	const trackers = trackersQuery.data ?? [];
 	const [showAdd, setShowAdd] = useState(false);
@@ -98,6 +101,7 @@ function Home() {
 						</span>
 					</div>
 					<div className="flex items-center gap-2">
+						<ThemeToggle />
 						<button
 							onClick={() =>
 								authClient.signOut({
@@ -123,18 +127,18 @@ function Home() {
 					className="panel reveal relative overflow-hidden"
 					style={{ animationDelay: "60ms" }}
 				>
-					<PixelScene />
+					<PixelScene night={isDark} />
 					<div className="absolute inset-0 bg-gradient-to-b from-sky-deep/25 via-transparent to-transparent" />
 					<div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5">
 						<div>
-							<p className="font-pixel text-[9px] tracking-widest text-cloud uppercase drop-shadow-[1px_1px_0_rgba(34,56,42,0.8)]">
+							<p className="font-pixel text-[9px] tracking-widest text-chalk uppercase drop-shadow-[1px_1px_0_rgba(34,56,42,0.8)]">
 								{today.toLocaleDateString("en-US", {
 									weekday: "long",
 									month: "long",
 									day: "numeric",
 								})}
 							</p>
-							<h1 className="font-display text-6xl leading-[0.9] text-cloud drop-shadow-[2px_2px_0_rgba(34,56,42,0.9)]">
+							<h1 className="font-display text-6xl leading-[0.9] text-chalk drop-shadow-[2px_2px_0_rgba(34,56,42,0.9)]">
 								Your quests
 							</h1>
 						</div>
@@ -163,7 +167,7 @@ function Home() {
 							className="panel reveal overflow-hidden"
 							style={{ animationDelay: "120ms" }}
 						>
-							<PixelScene />
+							<PixelScene night={isDark} />
 							<div className="border-t-2 border-pine p-6 text-center">
 								<p className="font-display text-4xl text-foreground">
 									Your quest log is empty
@@ -224,7 +228,7 @@ function TrackerCard({ tracker, index }: { tracker: any; index: number }) {
 					<span className="font-display text-xl leading-none text-lime">
 						{streak}
 					</span>
-					<span className="ml-1 font-pixel text-[8px] text-cloud uppercase">
+					<span className="ml-1 font-pixel text-[8px] text-chalk uppercase">
 						day streak
 					</span>
 				</span>

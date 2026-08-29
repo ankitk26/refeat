@@ -6,6 +6,7 @@ import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
 import { useConvex } from "convex/react";
 import { useMemo, useState } from "react";
 import LoginForm from "@/components/login-form";
+import ThemeToggle from "@/components/theme-toggle";
 import {
 	fromISO,
 	getDayStatus,
@@ -142,6 +143,7 @@ function TrackerDetail() {
 					>
 						← back
 					</Link>
+					<ThemeToggle />
 					<button
 						onClick={remove}
 						className="btn-pixel border-clay-deep bg-clay text-cloud shadow-[3px_3px_0_0_var(--clay-deep)] hover:bg-clay-deep"
@@ -165,7 +167,7 @@ function TrackerDetail() {
 							<p className="font-display text-5xl leading-none text-lime">
 								{streak}
 							</p>
-							<p className="font-pixel text-[8px] tracking-wide text-cloud uppercase">
+							<p className="font-pixel text-[8px] tracking-wide text-chalk uppercase">
 								day streak
 							</p>
 						</div>

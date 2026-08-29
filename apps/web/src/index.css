@@ -6,6 +6,7 @@
    Edit @refeat/ui/globals.css to change the whole theme.
    ────────────────────────────────────────────────────────── */
 :root {
+	color-scheme: light;
 	--background: #ecefd9;
 	--foreground: #22382a;
 	--card: #f8f6e8;
@@ -39,9 +40,11 @@
 	--cloud: #eef0dc;
 	--meadow: #8fae4e;
 	--paper: #f8f6e8;
+	--chalk: #eef0dc;
 }
 
 .dark {
+	color-scheme: dark;
 	--background: #14201a;
 	--foreground: #eef0dc;
 	--card: #1c2b21;
@@ -60,4 +63,19 @@
 	--border: #3d5233;
 	--input: #2e4335;
 	--ring: #a9bd63;
+
+	--lime: #a9bd63;
+	--lime-deep: #93a855;
+	--moss: #93a68a;
+	--forest: #1c2b21;
+	--pine: #14201a;
+	--sky: #5d8496;
+	--sky-light: #3d5a67;
+	--sky-deep: #48606e;
+	--clay: #c97a55;
+	--clay-deep: #a2603f;
+	--cloud: #243628;
+	--meadow: #7a9440;
+	--paper: #1c2b21;
+	--chalk: #eef0dc;
 }

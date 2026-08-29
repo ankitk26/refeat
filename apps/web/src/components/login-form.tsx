@@ -1,11 +1,13 @@
 import { Button } from "@refeat/ui/components/button";
 import PixelScene from "@/components/pixel-scene";
 import { authClient } from "@/lib/auth-client";
+import { useDarkMode } from "@/lib/dark-mode";
 
 export default function LoginForm() {
+	const [isDark] = useDarkMode();
 	return (
 		<div className="panel reveal w-full max-w-sm overflow-hidden !shadow-[6px_6px_0_0_var(--pine)]">
-			<PixelScene />
+			<PixelScene night={isDark} />
 
 			<div className="border-t-2 border-pine px-6 pt-6 pb-7 text-center">
 				<h1 className="font-display text-6xl leading-none text-foreground">
