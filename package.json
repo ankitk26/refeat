@@ -15,7 +15,9 @@
 		"dev:setup": "pnpm --filter @refeat/backend dev:setup",
 		"check": "oxlint && oxfmt --write",
 		"fmt": "oxfmt --write",
-		"deploy": "pnpm --filter @refeat/backend deploy:convex && pnpm --filter web deploy:cf"
+		"deploy": "pnpm deploy:convex && pnpm deploy:web",
+		"deploy:convex": "pnpm --filter @refeat/backend deploy:convex",
+		"deploy:web": "pnpm --filter web deploy:cf"
 	},
 	"dependencies": {
 		"@refeat/env": "workspace:*",
