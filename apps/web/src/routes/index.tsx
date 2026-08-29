@@ -72,17 +72,33 @@ function isSameDaySet(first: number[], second: number[]) {
 function Home() {
 	const [isDark] = useDarkMode();
 	const trackersQuery = useQuery(convexQuery(api.trackers.list, {}));
-	const trackers = trackersQuery.data ?? [];
 	const [showAdd, setShowAdd] = useState(false);
 	const today = useMemo(() => new Date(), []);
+	const completionsTodayQuery = useQuery(
+		convexQuery(api.completions.listForDate, { date: toISO(today) }),
+	);
+	const trackers = trackersQuery.data ?? [];
+	const completedTrackerIdsToday = new Set(
+		(completionsTodayQuery.data ?? []).map(
+			(completion: any) => completion.trackerId as string,
+		),
+	);
 	const ensureProfile = useConvexMutation(api.profiles.ensureMyProfile);
 	useEffect(() => {
 		ensureProfile({}).catch(() => {});
 	}, [ensureProfile]);
 
-	const dueToday = trackers.filter((t: any) =>
-		(t.frequency ?? []).includes(today.getDay()),
-	).length;
+	const dueToday = trackers.filter((tracker: any) => {
+		const todayIso = toISO(today);
+		const hasStarted = tracker.startDate <= todayIso;
+		const notFinished = !tracker.targetDate || tracker.targetDate >= todayIso;
+		return (
+			hasStarted &&
+			notFinished &&
+			(tracker.frequency ?? []).includes(today.getDay()) &&
+			!completedTrackerIdsToday.has(tracker._id)
+		);
+	}).length;
 
 	return (
 		<div className="min-h-svh">

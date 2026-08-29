@@ -34,6 +34,29 @@ export const getForDate = query({
 	},
 });
 
+/** All completions across the caller's trackers for one date. */
+export const listForDate = query({
+	args: { date: v.string() },
+	handler: async (ctx, args) => {
+		const profileId = await getCurrentProfileOrThrow(ctx);
+		const ownedTrackers = await ctx.db
+			.query("trackers")
+			.withIndex("by_profile", (q) => q.eq("profileId", profileId))
+			.collect();
+		const completionsForDate = await Promise.all(
+			ownedTrackers.map((tracker) =>
+				ctx.db
+					.query("completions")
+					.withIndex("by_tracker_date", (q) =>
+						q.eq("trackerId", tracker._id).eq("date", args.date),
+					)
+					.unique(),
+			),
+		);
+		return completionsForDate.filter((completion) => completion !== null);
+	},
+});
+
 export const toggle = mutation({
 	args: { trackerId: v.id("trackers"), date: v.string() },
 	handler: async (ctx, args) => {

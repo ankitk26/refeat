@@ -183,6 +183,11 @@
 		opacity: 0.5;
 		pointer-events: none;
 	}
+	/* dark: pine ink melts into the page — switch to border green + soft black shadow */
+	.dark :where(.btn-pixel) {
+		border-color: var(--border);
+		box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 0.55);
+	}
 
 	/* game-day cell: inset bevel like a tile */
 	.tile {
