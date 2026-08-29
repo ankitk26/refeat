@@ -6,54 +6,105 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ──────────────────────────────────────────────────────────
+   REFEAT — cozy pixel-adventure design system
+   Straight out of the reference pin: a pixel-art meadow.
+   · canvas: meadow cream over dusty-blue sky
+   · ink: deep pine forest · lime XP highlights · clay misses
+   · panels: chunky 2px pine borders + hard offset shadows
+   Type: Jersey 10 (display) · Baloo 2 (body) · Silkscreen (pixel)
+   ────────────────────────────────────────────────────────── */
 :root {
-	--background: #c8ddd6;
-	--foreground: #14302b;
-	--card: #f4f7f5;
-	--card-foreground: #14302b;
-	--popover: #f4f7f5;
-	--popover-foreground: #14302b;
-	--primary: #e85d4d;
-	--primary-foreground: #fff8f6;
-	--secondary: #e6f0ec;
-	--secondary-foreground: #14302b;
-	--muted: #ddeae6;
-	--muted-foreground: #6b8a80;
-	--accent: #e6f0ec;
-	--accent-foreground: #14302b;
-	--destructive: #e85d4d;
-	--border: #b9d0c6;
-	--input: #b9d0c6;
-	--ring: #e85d4d;
-	--radius: 0.9rem;
+	--background: #ecefd9;
+	--foreground: #22382a;
+	--card: #f8f6e8;
+	--card-foreground: #22382a;
+	--popover: #f8f6e8;
+	--popover-foreground: #22382a;
+	--primary: #2f4a35;
+	--primary-foreground: #f2f5e4;
+	--secondary: #e2e7c9;
+	--secondary-foreground: #22382a;
+	--muted: #e2e7c9;
+	--muted-foreground: #6f8168;
+	--accent: #dce4bf;
+	--accent-foreground: #22382a;
+	--destructive: #b96844;
+	--border: #3d5233;
+	--input: #c9d1a8;
+	--ring: #2f4a35;
+	--radius: 0.25rem;
 
-	--mint: #c8ddd6;
-	--mint-deep: #b6d2c7;
-	--mint-light: #e8f0ec;
-	--cream: #f0f5f3;
-	--ink: #14302b;
-	--ink-muted: #5a7a72;
-	--coral: #e85d4d;
-	--coral-hover: #d74c3b;
-	--coral-light: #feece9;
-	--sage: #7fb09e;
-	--sage-dark: #5a8a7a;
-	--water: #8fbab0;
-	--water-dark: #7aa89e;
-	--cloud: #e8ede6;
-	--stone: #dde6e1;
+	/* refeat custom — bg-lime, bg-sky, bg-pine, bg-clay … */
+	--lime: #a9bd63;
+	--lime-deep: #8ba14e;
+	--moss: #6f8168;
+	--forest: #2f4a35;
+	--pine: #22382a;
+	--sky: #7ea7bb;
+	--sky-light: #a9c6d3;
+	--sky-deep: #628fa3;
+	--clay: #b96844;
+	--clay-deep: #9d5436;
+	--cloud: #eef0dc;
+	--meadow: #8fae4e;
+	--paper: #f8f6e8;
+}
+
+.dark {
+	--background: #14201a;
+	--foreground: #eef0dc;
+	--card: #1c2b21;
+	--card-foreground: #eef0dc;
+	--popover: #1c2b21;
+	--popover-foreground: #eef0dc;
+	--primary: #a9bd63;
+	--primary-foreground: #1d2f24;
+	--secondary: #243628;
+	--secondary-foreground: #eef0dc;
+	--muted: #243628;
+	--muted-foreground: #93a68a;
+	--accent: #243628;
+	--accent-foreground: #eef0dc;
+	--destructive: #c97a55;
+	--border: #3d5233;
+	--input: #2e4335;
+	--ring: #a9bd63;
+
+	--lime: #a9bd63;
+	--lime-deep: #93a855;
+	--moss: #93a68a;
+	--forest: #1c2b21;
+	--pine: #14201a;
+	--sky: #5d8496;
+	--sky-light: #3d5a67;
+	--sky-deep: #48606e;
+	--clay: #c97a55;
+	--clay-deep: #a2603f;
+	--cloud: #243628;
+	--meadow: #7a9440;
+	--paper: #1c2b21;
 }
 
 @theme inline {
-	--font-sans: "JetBrains Mono", monospace;
-	--font-display: "JetBrains Mono", monospace;
-	--font-mono: "JetBrains Mono", monospace;
-	--font-pixel: "Pixelify Sans", monospace;
-	--color-sage: var(--sage);
-	--color-sage-dark: var(--sage-dark);
-	--color-water: var(--water);
-	--color-mint: var(--mint);
-	--color-cream: var(--cream);
+	--font-sans: "Baloo 2", ui-rounded, system-ui, sans-serif;
+	--font-display: "Jersey 10", var(--font-pixel);
+	--font-mono: "Silkscreen", ui-monospace, monospace;
+	--font-pixel: "Silkscreen", monospace;
+
+	--color-lime: var(--lime);
+	--color-lime-deep: var(--lime-deep);
+	--color-moss: var(--moss);
+	--color-forest: var(--forest);
+	--color-pine: var(--pine);
+	--color-sky: var(--sky);
+	--color-sky-light: var(--sky-light);
+	--color-sky-deep: var(--sky-deep);
+	--color-clay: var(--clay);
+	--color-clay-deep: var(--clay-deep);
+	--color-cloud: var(--cloud);
+	--color-meadow: var(--meadow);
+	--color-paper: var(--paper);
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
 	--color-card: var(--card);
@@ -72,12 +123,12 @@
 	--color-border: var(--border);
 	--color-input: var(--input);
 	--color-ring: var(--ring);
-	--radius-sm: calc(var(--radius) - 4px);
-	--radius-md: calc(var(--radius) - 2px);
-	--radius-lg: var(--radius);
+	--radius-sm: calc(var(--radius) - 2px);
+	--radius-md: var(--radius);
+	--radius-lg: calc(var(--radius) + 2px);
 	--radius-xl: calc(var(--radius) + 4px);
-	--radius-2xl: calc(var(--radius) + 8px);
-	--radius-3xl: calc(var(--radius) + 12px);
+	--radius-2xl: calc(var(--radius) + 6px);
+	--radius-3xl: calc(var(--radius) + 10px);
 }
 
 @layer base {
@@ -85,19 +136,66 @@
 		@apply border-border outline-ring/50;
 	}
 	body {
-		@apply text-foreground antialiased;
-		background: #c8ddd6;
-		font-family: var(--font-mono);
-		/* subtle paper grain like the reference's soft texture */
+		@apply bg-background text-foreground antialiased;
+		font-family: var(--font-sans);
+		/* dithered paper grain, like the pixel scene */
 		background-image: radial-gradient(
 			circle at 2px 2px,
-			rgba(20, 48, 43, 0.04) 1px,
+			rgba(34, 56, 42, 0.05) 1px,
 			transparent 0
 		);
-		background-size: 28px 28px;
+		background-size: 22px 22px;
 	}
 	html {
-		font-family: var(--font-mono);
+		font-family: var(--font-sans);
+	}
+}
+
+@layer components {
+	/* chunky RPG panel: crisp border + hard offset shadow */
+	.panel {
+		@apply rounded-lg border-2 border-pine bg-card;
+		box-shadow: 4px 4px 0 0 var(--pine);
+	}
+	.dark .panel {
+		box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.55);
+	}
+
+	/* pixel button — presses into the page */
+	.btn-pixel {
+		@apply inline-flex items-center justify-center gap-1.5 rounded-md border-2 border-pine px-4 py-2 font-pixel text-[11px] tracking-wide uppercase select-none;
+		box-shadow: 3px 3px 0 0 var(--pine);
+		transition:
+			transform 80ms steps(2),
+			box-shadow 80ms steps(2),
+			background-color 120ms;
+	}
+	.btn-pixel:active {
+		transform: translate(3px, 3px);
+		box-shadow: 0 0 0 0 var(--pine);
+	}
+	.btn-pixel:disabled {
+		opacity: 0.5;
+		pointer-events: none;
+	}
+
+	/* game-day cell: inset bevel like a tile */
+	.tile {
+		box-shadow: inset 0 -3px 0 0 rgba(0, 0, 0, 0.18);
+	}
+	.tile-off {
+		box-shadow: inset 0 -2px 0 0 rgba(0, 0, 0, 0.06);
+	}
+
+	/* "you are here" cell: inverted tile with a flickering pixel shadow */
+	.tile-today {
+		box-shadow: 3px 3px 0 0 var(--lime-deep);
+	}
+
+	/* staggered page-load reveal */
+	.reveal {
+		opacity: 0;
+		animation: rise 0.45s steps(6) forwards;
 	}
 }
 
@@ -107,14 +205,24 @@
 	image-rendering: crisp-edges;
 }
 
-/* float animation for clouds */
-@keyframes drift {
-	0%,
-	100% {
-		transform: translateX(0);
+@keyframes rise {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
 	}
-	50% {
-		transform: translateX(6px);
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* clouds sail across the sky band */
+@keyframes drift {
+	from {
+		transform: translateX(-14px);
+	}
+	to {
+		transform: translateX(14px);
 	}
 }
 @keyframes bob {
@@ -123,7 +231,7 @@
 		transform: translateY(0);
 	}
 	50% {
-		transform: translateY(2px);
+		transform: translateY(3px);
 	}
 }
 @keyframes shimmer {
@@ -138,13 +246,13 @@
 	}
 }
 
-/* scrollbar */
+/* scrollbar — olive twig */
 ::-webkit-scrollbar {
 	width: 6px;
 	height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-	background: #a8c4b8;
+	background: var(--moss);
 	border-radius: 999px;
 }
 ::-webkit-scrollbar-track {

@@ -9,11 +9,13 @@ import {
 	useConvex,
 	useMutation as useConvexMutation,
 } from "convex/react";
+import { LogOut } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import LoginForm from "@/components/login-form";
+import PixelScene from "@/components/pixel-scene";
+import { authClient } from "@/lib/auth-client";
 import {
 	computeCurrentStreak,
-	fromISO,
 	getDayStatus,
 	getMonthDays,
 	toISO,
@@ -35,8 +37,8 @@ function HomeGate() {
 				</div>
 			</Unauthenticated>
 			<AuthLoading>
-				<div className="grid min-h-svh place-items-center bg-background font-mono text-sm text-muted-foreground">
-					Loading...
+				<div className="grid min-h-svh place-items-center bg-background font-pixel text-xs text-muted-foreground uppercase">
+					Loading…
 				</div>
 			</AuthLoading>
 		</>
@@ -44,14 +46,26 @@ function HomeGate() {
 }
 
 const DAYS = [
-	{ label: "Mon", v: 1 },
-	{ label: "Tue", v: 2 },
-	{ label: "Wed", v: 3 },
-	{ label: "Thu", v: 4 },
-	{ label: "Fri", v: 5 },
-	{ label: "Sat", v: 6 },
-	{ label: "Sun", v: 0 },
+	{ label: "M", value: 1 },
+	{ label: "T", value: 2 },
+	{ label: "W", value: 3 },
+	{ label: "T", value: 4 },
+	{ label: "F", value: 5 },
+	{ label: "S", value: 6 },
+	{ label: "S", value: 0 },
 ];
+
+const FREQUENCY_PRESETS = [
+	{ label: "all days", weekdays: [0, 1, 2, 3, 4, 5, 6] },
+	{ label: "weekdays", weekdays: [1, 2, 3, 4, 5] },
+	{ label: "weekends", weekdays: [0, 6] },
+];
+
+function isSameDaySet(first: number[], second: number[]) {
+	return (
+		first.length === second.length && first.every((day) => second.includes(day))
+	);
+}
 
 function Home() {
 	const trackersQuery = useQuery(convexQuery(api.trackers.list, {}));
@@ -63,64 +77,112 @@ function Home() {
 		ensureProfile({}).catch(() => {});
 	}, [ensureProfile]);
 
+	const dueToday = trackers.filter((t: any) =>
+		(t.frequency ?? []).includes(today.getDay()),
+	).length;
+
 	return (
-		<div className="min-h-svh bg-background">
-			<div className="mx-auto max-w-xl px-4 pb-10 md:px-6">
-				<header className="flex items-center justify-between py-4">
-					<div className="flex items-center gap-2">
-						<span className="text-sm">🌲</span>
-						<span className="font-display text-sm font-semibold tracking-tight text-foreground">
+		<div className="min-h-svh">
+			<div className="mx-auto max-w-xl px-4 pb-20 md:px-6">
+				{/* ── top bar ─────────────────────────────── */}
+				<header
+					className="reveal flex items-center justify-between py-5"
+					style={{ animationDelay: "0ms" }}
+				>
+					<div className="flex items-center gap-2.5">
+						<span className="grid h-9 w-9 place-items-center rounded-md border-2 border-pine bg-lime text-base shadow-[2px_2px_0_0_var(--pine)]">
+							🌲
+						</span>
+						<span className="font-pixel text-sm tracking-wide text-foreground">
 							refeat
 						</span>
 					</div>
-					<button
-						onClick={() => setShowAdd(true)}
-						className="rounded-full bg-primary px-4 py-1.5 font-mono text-xs font-medium text-primary-foreground hover:bg-primary/90"
-					>
-						+ New
-					</button>
+					<div className="flex items-center gap-2">
+						<button
+							onClick={() =>
+								authClient.signOut({
+									fetchOptions: { onSuccess: () => location.reload() },
+								})
+							}
+							className="btn-pixel bg-card !px-3 text-foreground hover:bg-secondary"
+							aria-label="Sign out"
+						>
+							<LogOut className="h-3.5 w-3.5" />
+						</button>
+						<button
+							onClick={() => setShowAdd(true)}
+							className="btn-pixel bg-lime text-pine hover:bg-lime-deep"
+						>
+							+ new quest
+						</button>
+					</div>
 				</header>
 
-				<div className="pt-1">
-					<h1 className="font-display text-2xl leading-none font-bold tracking-tight text-foreground">
-						Your habits
-					</h1>
-					<p className="mt-1 font-mono text-xs text-muted-foreground">
-						{today.toLocaleDateString("en-US", {
-							weekday: "long",
-							month: "long",
-							day: "numeric",
-						})}{" "}
-						• {trackers.length} {trackers.length === 1 ? "tracker" : "trackers"}
-					</p>
-				</div>
+				{/* ── sky hero ────────────────────────────── */}
+				<section
+					className="panel reveal relative overflow-hidden"
+					style={{ animationDelay: "60ms" }}
+				>
+					<PixelScene />
+					<div className="absolute inset-0 bg-gradient-to-b from-sky-deep/25 via-transparent to-transparent" />
+					<div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5">
+						<div>
+							<p className="font-pixel text-[9px] tracking-widest text-cloud uppercase drop-shadow-[1px_1px_0_rgba(34,56,42,0.8)]">
+								{today.toLocaleDateString("en-US", {
+									weekday: "long",
+									month: "long",
+									day: "numeric",
+								})}
+							</p>
+							<h1 className="font-display text-6xl leading-[0.9] text-cloud drop-shadow-[2px_2px_0_rgba(34,56,42,0.9)]">
+								Your quests
+							</h1>
+						</div>
+						<div className="shrink-0 rounded-md border-2 border-pine bg-paper px-3 py-2 text-center shadow-[3px_3px_0_0_var(--pine)]">
+							<p className="font-display text-3xl leading-none text-foreground">
+								{dueToday}
+							</p>
+							<p className="font-pixel text-[8px] tracking-wide text-muted-foreground uppercase">
+								due today
+							</p>
+						</div>
+					</div>
+				</section>
 
-				<div className="mt-5 grid gap-3">
+				{/* ── tracker list ────────────────────────── */}
+				<div className="mt-6 grid gap-4">
 					{trackersQuery.isLoading &&
 						[0, 1].map((i) => (
 							<div
 								key={i}
-								className="h-28 animate-pulse rounded-xl bg-secondary"
+								className="panel h-36 animate-pulse !shadow-[4px_4px_0_0_var(--border)]"
 							/>
 						))}
 					{trackers.length === 0 && !trackersQuery.isLoading && (
-						<div className="rounded-xl border border-dashed border-border/60 bg-card/70 p-6 text-center">
-							<p className="font-display text-sm font-semibold text-foreground">
-								No habits yet
-							</p>
-							<p className="mx-auto mt-1 max-w-[26ch] font-mono text-xs text-muted-foreground">
-								Add a habit to start tracking.
-							</p>
-							<button
-								onClick={() => setShowAdd(true)}
-								className="mt-3 rounded-full bg-primary px-4 py-1.5 font-mono text-xs text-white"
-							>
-								Add habit
-							</button>
+						<div
+							className="panel reveal overflow-hidden"
+							style={{ animationDelay: "120ms" }}
+						>
+							<PixelScene />
+							<div className="border-t-2 border-pine p-6 text-center">
+								<p className="font-display text-4xl text-foreground">
+									Your quest log is empty
+								</p>
+								<p className="mx-auto mt-2 max-w-[34ch] text-sm text-muted-foreground">
+									Accept a quest, come back each day to complete it, and watch
+									the streak grow.
+								</p>
+								<button
+									onClick={() => setShowAdd(true)}
+									className="btn-pixel mt-5 bg-lime text-pine hover:bg-lime-deep"
+								>
+									⚔ accept your first quest
+								</button>
+							</div>
 						</div>
 					)}
-					{trackers.map((t: any) => (
-						<TrackerCard key={t._id} tracker={t} />
+					{trackers.map((t: any, i: number) => (
+						<TrackerCard key={t._id} tracker={t} index={i} />
 					))}
 				</div>
 			</div>
@@ -129,7 +191,7 @@ function Home() {
 	);
 }
 
-function TrackerCard({ tracker }: { tracker: any }) {
+function TrackerCard({ tracker, index }: { tracker: any; index: number }) {
 	const completionsQuery = useQuery(
 		convexQuery(api.completions.listByTracker, { trackerId: tracker._id }),
 	);
@@ -151,17 +213,23 @@ function TrackerCard({ tracker }: { tracker: any }) {
 		<Link
 			to="/trackers/$id"
 			params={{ id: tracker._id }}
-			className="block rounded-xl border border-border/40 bg-card p-3 shadow-sm"
+			className="panel reveal block p-4"
+			style={{ animationDelay: `${140 + index * 70}ms` }}
 		>
-			<div className="flex items-center justify-between gap-2">
-				<h3 className="truncate font-display text-sm font-bold text-foreground">
+			<div className="flex items-center justify-between gap-3">
+				<h3 className="truncate text-lg font-bold text-foreground">
 					{tracker.title}
 				</h3>
-				<span className="shrink-0 rounded-full bg-secondary px-2.5 py-1 font-mono text-xs text-foreground">
-					{streak} streak
+				<span className="shrink-0 rounded-md border-2 border-pine bg-pine px-2.5 py-1 shadow-[2px_2px_0_0_var(--lime-deep)]">
+					<span className="font-display text-xl leading-none text-lime">
+						{streak}
+					</span>
+					<span className="ml-1 font-pixel text-[8px] text-cloud uppercase">
+						day streak
+					</span>
 				</span>
 			</div>
-			<div className="mt-3 grid grid-cols-14 gap-1.5">
+			<div className="mt-4 grid grid-cols-14 gap-1">
 				{days.map((d) => {
 					const status = getDayStatus(d, tracker, set, today);
 					const isToday = toISO(d) === toISO(today);
@@ -169,16 +237,16 @@ function TrackerCard({ tracker }: { tracker: any }) {
 						<div
 							key={toISO(d)}
 							className={[
-								"flex h-7 w-7 items-center justify-center rounded-full font-mono text-xs",
+								"relative grid h-7 place-items-center rounded-[3px] border font-mono text-[9px]",
 								status === "done"
-									? "bg-sage text-white"
+									? "tile border-pine bg-lime text-pine"
 									: status === "failed"
-										? "bg-primary text-white"
+										? "tile border-pine bg-clay text-cloud"
 										: status === "not_required"
-											? "bg-secondary text-muted-foreground/40"
-											: "bg-card border border-border text-muted-foreground",
+											? "tile-off border-transparent bg-secondary/70 text-muted-foreground/40"
+											: "tile-off border-input bg-card text-muted-foreground",
 								isToday
-									? "ring-1 ring-primary/40 ring-offset-1 ring-offset-card"
+									? "!border-pine !bg-pine !text-lime font-bold tile-today"
 									: "",
 							].join(" ")}
 						>
@@ -195,41 +263,43 @@ function AddTrackerDialog({ onClose }: { onClose: () => void }) {
 	const [title, setTitle] = useState("");
 	const [startDate, setStartDate] = useState(() => toISO(new Date()));
 	const [targetDate, setTargetDate] = useState("");
-	const [freq, setFreq] = useState<number[]>([1, 2, 3, 4, 5, 6, 0]);
+	const [frequency, setFrequency] = useState<number[]>([1, 2, 3, 4, 5, 6, 0]);
 	const { mutateAsync, isPending } = useConvexCreate();
-	function toggleDay(v: number) {
-		setFreq((prev) =>
-			prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v].sort(),
+	function toggleDay(weekday: number) {
+		setFrequency((currentFrequency) =>
+			currentFrequency.includes(weekday)
+				? currentFrequency.filter((day) => day !== weekday)
+				: [...currentFrequency, weekday].sort(),
 		);
 	}
 	async function handleSubmit(e: React.FormEvent) {
 		e.preventDefault();
 		if (!title.trim()) return;
-		if (freq.length === 0) return alert("Pick at least one day");
+		if (frequency.length === 0) return alert("Pick at least one day");
 		await mutateAsync({
 			title: title.trim(),
 			startDate,
 			targetDate: targetDate || undefined,
-			frequency: freq,
+			frequency,
 		});
 		onClose();
 	}
 	return (
 		<div
-			className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/20 p-0 backdrop-blur-sm md:items-center md:p-4"
+			className="fixed inset-0 z-50 flex items-end justify-center bg-pine/50 p-0 backdrop-blur-[2px] md:items-center md:p-4"
 			onClick={onClose}
 		>
 			<div
 				onClick={(e) => e.stopPropagation()}
-				className="w-full max-w-md rounded-t-xl border border-border bg-card p-4 shadow-xl md:rounded-xl"
+				className="panel reveal w-full max-w-md !rounded-b-none border-b-0 p-5 md:!rounded-b-lg md:border-b-2"
 			>
 				<div className="flex items-center justify-between">
-					<h3 className="font-display text-sm font-bold text-foreground">
-						New habit
+					<h3 className="font-display text-4xl leading-none text-foreground">
+						New quest
 					</h3>
 					<button
 						onClick={onClose}
-						className="flex h-7 w-7 items-center justify-center rounded-full border border-border bg-white text-xs"
+						className="grid h-7 w-7 place-items-center rounded-[3px] border-2 border-pine bg-card font-pixel text-[10px] text-muted-foreground shadow-[2px_2px_0_0_var(--pine)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
 					>
 						✕
 					</button>
@@ -238,49 +308,84 @@ function AddTrackerDialog({ onClose }: { onClose: () => void }) {
 					<input
 						value={title}
 						onChange={(e) => setTitle(e.target.value)}
-						placeholder="Habit title"
-						className="w-full rounded-xl border border-border bg-white px-3 py-2.5 text-sm outline-none focus:border-foreground"
+						placeholder="e.g. Read 10 pages"
+						className="w-full rounded-md border-2 border-pine bg-background px-3 py-2.5 text-sm font-medium outline-none placeholder:text-muted-foreground/50 focus:bg-card"
 						required
 						maxLength={48}
 					/>
 					<div className="grid grid-cols-2 gap-2">
-						<input
-							type="date"
-							value={startDate}
-							onChange={(e) => setStartDate(e.target.value)}
-							className="rounded-xl border border-border bg-white px-2.5 py-2 text-sm outline-none"
-							required
-						/>
-						<input
-							type="date"
-							value={targetDate}
-							onChange={(e) => setTargetDate(e.target.value)}
-							className="rounded-xl border border-border bg-white px-2.5 py-2 text-sm outline-none"
-						/>
+						<label className="grid gap-1">
+							<span className="font-pixel text-[9px] tracking-wide text-muted-foreground uppercase">
+								start
+							</span>
+							<input
+								type="date"
+								value={startDate}
+								onChange={(e) => setStartDate(e.target.value)}
+								className="rounded-md border-2 border-pine bg-background px-2.5 py-2 font-mono text-[11px] outline-none"
+								required
+							/>
+						</label>
+						<label className="grid gap-1">
+							<span className="font-pixel text-[9px] tracking-wide text-muted-foreground uppercase">
+								target (optional)
+							</span>
+							<input
+								type="date"
+								value={targetDate}
+								onChange={(e) => setTargetDate(e.target.value)}
+								className="rounded-md border-2 border-pine bg-background px-2.5 py-2 font-mono text-[11px] outline-none"
+							/>
+						</label>
 					</div>
-					<div className="grid grid-cols-7 gap-1.5">
-						{DAYS.map((d) => (
-							<button
-								key={d.v}
-								type="button"
-								onClick={() => toggleDay(d.v)}
-								className={[
-									"rounded-full border py-2 font-mono text-xs",
-									freq.includes(d.v)
-										? "border-foreground bg-foreground text-white"
-										: "border-border bg-white text-muted-foreground",
-								].join(" ")}
-							>
-								{d.label.slice(0, 2)}
-							</button>
-						))}
+					<div className="grid gap-1">
+						<span className="font-pixel text-[9px] tracking-wide text-muted-foreground uppercase">
+							repeat on
+						</span>
+						<div className="flex gap-1.5">
+							{FREQUENCY_PRESETS.map((preset) => {
+								const isActivePreset = isSameDaySet(frequency, preset.weekdays);
+								return (
+									<button
+										key={preset.label}
+										type="button"
+										onClick={() => setFrequency(preset.weekdays)}
+										className={[
+											"flex-1 rounded-[3px] border-2 py-1.5 font-pixel text-[9px] tracking-wide uppercase",
+											isActivePreset
+												? "border-pine bg-forest text-primary-foreground shadow-[2px_2px_0_0_var(--lime-deep)]"
+												: "border-input bg-card text-muted-foreground hover:bg-secondary",
+										].join(" ")}
+									>
+										{preset.label}
+									</button>
+								);
+							})}
+						</div>
+						<div className="grid grid-cols-7 gap-1.5">
+							{DAYS.map((day, index) => (
+								<button
+									key={index}
+									type="button"
+									onClick={() => toggleDay(day.value)}
+									className={[
+										"grid h-9 place-items-center rounded-[3px] border-2 font-pixel text-[10px]",
+										frequency.includes(day.value)
+											? "tile border-pine bg-forest text-primary-foreground"
+											: "border-input bg-card text-muted-foreground hover:bg-secondary",
+									].join(" ")}
+								>
+									{day.label}
+								</button>
+							))}
+						</div>
 					</div>
 					<button
 						type="submit"
 						disabled={isPending}
-						className="rounded-full bg-primary py-2.5 font-mono text-sm font-medium text-white hover:bg-primary/90 disabled:opacity-50"
+						className="btn-pixel mt-1 w-full bg-lime text-sm text-pine hover:bg-lime-deep"
 					>
-						{isPending ? "Creating..." : "Create"}
+						{isPending ? "accepting…" : "⚔ accept quest"}
 					</button>
 				</form>
 			</div>

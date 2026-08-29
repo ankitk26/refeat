@@ -1,67 +1,63 @@
 @import "@refeat/ui/globals.css";
 
 /* ──────────────────────────────────────────────────────────
-   REFEAT DESIGN TOKENS — single source of truth
-   Like shadcn: edit :root to change the whole theme
-   Palette derived from pin: mint/calm pixel garden
+   REFEAT DESIGN TOKENS — app-level mirror of @refeat/ui
+   Cozy pixel-adventure palette (dusty blue · cream · lime · pine)
+   Edit @refeat/ui/globals.css to change the whole theme.
    ────────────────────────────────────────────────────────── */
 :root {
-	/* shadcn tokens */
-	--background: #c8ddd6;
-	--foreground: #14302b;
-	--card: #f4f7f5;
-	--card-foreground: #14302b;
-	--popover: #f4f7f5;
-	--popover-foreground: #14302b;
-	--primary: #e85d4d; /* coral CTA */
-	--primary-foreground: #fff8f6;
-	--secondary: #e6f0ec;
-	--secondary-foreground: #14302b;
-	--muted: #ddeae6;
-	--muted-foreground: #6b8a80;
-	--accent: #e6f0ec;
-	--accent-foreground: #14302b;
-	--destructive: #e85d4d;
-	--border: #b9d0c6;
-	--input: #b9d0c6;
-	--ring: #e85d4d;
-	--radius: 0.9rem;
+	--background: #ecefd9;
+	--foreground: #22382a;
+	--card: #f8f6e8;
+	--card-foreground: #22382a;
+	--popover: #f8f6e8;
+	--popover-foreground: #22382a;
+	--primary: #2f4a35;
+	--primary-foreground: #f2f5e4;
+	--secondary: #e2e7c9;
+	--secondary-foreground: #22382a;
+	--muted: #e2e7c9;
+	--muted-foreground: #6f8168;
+	--accent: #dce4bf;
+	--accent-foreground: #22382a;
+	--destructive: #b96844;
+	--border: #3d5233;
+	--input: #c9d1a8;
+	--ring: #2f4a35;
+	--radius: 0.25rem;
 
-	/* refeat custom — also available as bg-sage, bg-water etc. */
-	--sage: #7fb09e;
-	--sage-dark: #5a8a7a;
-	--water: #8fbab0;
-	--mint: #c8ddd6;
-	--cream: #f0f5f3;
+	--lime: #a9bd63;
+	--lime-deep: #8ba14e;
+	--moss: #6f8168;
+	--forest: #2f4a35;
+	--pine: #22382a;
+	--sky: #7ea7bb;
+	--sky-light: #a9c6d3;
+	--sky-deep: #628fa3;
+	--clay: #b96844;
+	--clay-deep: #9d5436;
+	--cloud: #eef0dc;
+	--meadow: #8fae4e;
+	--paper: #f8f6e8;
 }
 
 .dark {
-	--background: #0f201c;
-	--foreground: #e6f0ec;
-	--card: #162e28;
-	--card-foreground: #e6f0ec;
-	--popover: #162e28;
-	--popover-foreground: #e6f0ec;
-	--primary: #e85d4d;
-	--primary-foreground: #fff8f6;
-	--secondary: #1e3a32;
-	--secondary-foreground: #e6f0ec;
-	--muted: #1e3a32;
-	--muted-foreground: #8fbab0;
-	--accent: #1e3a32;
-	--accent-foreground: #e6f0ec;
-	--destructive: #e85d4d;
-	--border: #2a4a42;
-	--input: #2a4a42;
-	--ring: #e85d4d;
-}
-
-/* font utilities — use className="font-display" / "font-mono" instead of inline styles */
-@layer utilities {
-	.font-display {
-		font-family: var(--font-display);
-	}
-	.font-mono {
-		font-family: var(--font-mono);
-	}
+	--background: #14201a;
+	--foreground: #eef0dc;
+	--card: #1c2b21;
+	--card-foreground: #eef0dc;
+	--popover: #1c2b21;
+	--popover-foreground: #eef0dc;
+	--primary: #a9bd63;
+	--primary-foreground: #1d2f24;
+	--secondary: #243628;
+	--secondary-foreground: #eef0dc;
+	--muted: #243628;
+	--muted-foreground: #93a68a;
+	--accent: #243628;
+	--accent-foreground: #eef0dc;
+	--destructive: #c97a55;
+	--border: #3d5233;
+	--input: #2e4335;
+	--ring: #a9bd63;
 }
