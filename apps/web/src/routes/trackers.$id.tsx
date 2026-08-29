@@ -6,6 +6,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
 import { useConvex } from "convex/react";
 import { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import LoginForm from "@/components/login-form";
 import ThemeToggle from "@/components/theme-toggle";
 import {
@@ -66,6 +67,7 @@ function TrackerDetail() {
 
 	const today = useMemo(() => new Date(), []);
 	const [statusDate, setStatusDate] = useState<string | null>(null);
+	const [confirmDelete, setConfirmDelete] = useState(false);
 	const [cursor, setCursor] = useState(
 		() => new Date(today.getFullYear(), today.getMonth(), 1),
 	);
@@ -142,7 +144,6 @@ function TrackerDetail() {
 		}
 	}
 	async function remove() {
-		if (!confirm("Delete?")) return;
 		await convex.mutation(api.trackers.remove, { id: trackerId });
 		navigate({ to: "/" });
 	}
@@ -159,7 +160,7 @@ function TrackerDetail() {
 					</Link>
 					<ThemeToggle />
 					<button
-						onClick={remove}
+						onClick={() => setConfirmDelete(true)}
 						className="btn-pixel border-clay-deep bg-clay text-chalk shadow-[3px_3px_0_0_var(--clay-deep)] hover:bg-clay-deep"
 					>
 						delete
@@ -173,12 +174,12 @@ function TrackerDetail() {
 							<p className="font-pixel text-[9px] tracking-widest text-muted-foreground uppercase">
 								current quest
 							</p>
-							<h1 className="mt-1 truncate font-display text-5xl leading-[0.95] text-foreground">
+							<h1 className="mt-1 font-display text-4xl leading-[0.95] text-foreground sm:text-5xl">
 								{tracker.title}
 							</h1>
 						</div>
-						<div className="shrink-0 rounded-md border-2 border-pine bg-pine px-4 py-3 text-center shadow-[3px_3px_0_0_var(--lime-deep)]">
-							<p className="font-display text-5xl leading-none text-lime">
+						<div className="shrink-0 rounded-md border-2 border-pine bg-pine px-3 py-2 text-center shadow-[3px_3px_0_0_var(--lime-deep)] sm:px-4 sm:py-3">
+							<p className="font-display text-3xl leading-none text-lime sm:text-5xl">
 								{streak}
 							</p>
 							<p className="font-pixel text-[8px] tracking-wide text-chalk uppercase">
@@ -300,53 +301,91 @@ function TrackerDetail() {
 							today
 						</span>
 					</div>
-					{statusDate && tracker && (
-						<div
-							className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4"
-							onClick={() => setStatusDate(null)}
-						>
+					{confirmDelete &&
+						createPortal(
 							<div
-								className="panel w-full max-w-xs p-5"
-								onClick={(e) => e.stopPropagation()}
+								className="fixed inset-0 z-50 flex items-end justify-center bg-pine/50 backdrop-blur-[2px] md:items-center md:p-4"
+								onClick={() => setConfirmDelete(false)}
 							>
-								<p className="font-pixel text-[9px] tracking-widest text-muted-foreground uppercase">
-									set status
-								</p>
-								<h2 className="mt-1 font-display text-3xl text-foreground">
-									{formatShort(fromISO(statusDate))}
-								</h2>
-								<p className="mt-1 font-pixel text-[9px] text-muted-foreground uppercase">
-									now: {getDayStatus(fromISO(statusDate), tracker, set, today)}
-								</p>
-								<div className="mt-4 grid gap-2">
-									<button
-										onClick={() => applyStatus(statusDate, "done")}
-										className="btn-pixel bg-lime text-sm text-pine uppercase hover:bg-lime-deep"
-									>
-										done
-									</button>
-									<button
-										onClick={() => applyStatus(statusDate, "missed")}
-										className="btn-pixel border-clay-deep bg-clay text-sm text-chalk uppercase shadow-[3px_3px_0_0_var(--clay-deep)] hover:bg-clay-deep"
-									>
-										missed
-									</button>
-									<button
-										onClick={() => applyStatus(statusDate, "pending")}
-										className="btn-pixel bg-card text-sm text-foreground uppercase hover:bg-secondary"
-									>
-										pending
-									</button>
-									<button
-										onClick={() => setStatusDate(null)}
-										className="btn-pixel bg-secondary text-sm text-muted-foreground uppercase"
-									>
-										cancel
-									</button>
+								<div
+									className="panel w-full max-w-xs !rounded-b-none border-b-0 p-5 md:!rounded-b-lg md:border-b-2"
+									onClick={(e) => e.stopPropagation()}
+								>
+									<h3 className="font-display text-3xl leading-none text-foreground">
+										Delete quest?
+									</h3>
+									<p className="mt-2 font-pixel text-[10px] leading-relaxed text-muted-foreground">
+										“{tracker.title}” and its history will be gone for good.
+									</p>
+									<div className="mt-4 grid grid-cols-2 gap-2">
+										<button
+											onClick={() => setConfirmDelete(false)}
+											className="btn-pixel bg-card text-sm text-foreground uppercase hover:bg-secondary"
+										>
+											keep it
+										</button>
+										<button
+											onClick={remove}
+											className="btn-pixel border-clay-deep bg-clay text-sm text-chalk uppercase shadow-[3px_3px_0_0_var(--clay-deep)] hover:bg-clay-deep"
+										>
+											delete
+										</button>
+									</div>
 								</div>
-							</div>
-						</div>
-					)}
+							</div>,
+							document.body,
+						)}
+					{statusDate &&
+						tracker &&
+						createPortal(
+							<div
+								className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4"
+								onClick={() => setStatusDate(null)}
+							>
+								<div
+									className="panel w-full max-w-xs p-5"
+									onClick={(e) => e.stopPropagation()}
+								>
+									<p className="font-pixel text-[9px] tracking-widest text-muted-foreground uppercase">
+										set status
+									</p>
+									<h2 className="mt-1 font-display text-3xl text-foreground">
+										{formatShort(fromISO(statusDate))}
+									</h2>
+									<p className="mt-1 font-pixel text-[9px] text-muted-foreground uppercase">
+										now:{" "}
+										{getDayStatus(fromISO(statusDate), tracker, set, today)}
+									</p>
+									<div className="mt-4 grid gap-2">
+										<button
+											onClick={() => applyStatus(statusDate, "done")}
+											className="btn-pixel bg-lime text-sm text-pine uppercase hover:bg-lime-deep"
+										>
+											done
+										</button>
+										<button
+											onClick={() => applyStatus(statusDate, "missed")}
+											className="btn-pixel border-clay-deep bg-clay text-sm text-chalk uppercase shadow-[3px_3px_0_0_var(--clay-deep)] hover:bg-clay-deep"
+										>
+											missed
+										</button>
+										<button
+											onClick={() => applyStatus(statusDate, "pending")}
+											className="btn-pixel bg-card text-sm text-foreground uppercase hover:bg-secondary"
+										>
+											pending
+										</button>
+										<button
+											onClick={() => setStatusDate(null)}
+											className="btn-pixel bg-secondary text-sm text-muted-foreground uppercase"
+										>
+											cancel
+										</button>
+									</div>
+								</div>
+							</div>,
+							document.body,
+						)}
 				</section>
 			</div>
 		</div>

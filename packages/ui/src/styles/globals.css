@@ -177,7 +177,7 @@
 
 	/* pixel button — presses into the page */
 	.btn-pixel {
-		@apply inline-flex items-center justify-center gap-1.5 rounded-md border-2 border-pine px-4 py-2 font-pixel text-[11px] tracking-wide uppercase select-none;
+		@apply inline-flex items-center justify-center gap-1.5 rounded-md border-2 border-pine px-4 py-2 font-pixel text-[11px] tracking-wide whitespace-nowrap uppercase select-none;
 		box-shadow: 3px 3px 0 0 var(--pine);
 		transition:
 			transform 80ms steps(2),

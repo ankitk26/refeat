@@ -10,7 +10,7 @@ import {
 	useConvex,
 	useMutation as useConvexMutation,
 } from "convex/react";
-import { LogOut } from "lucide-react";
+import { LogOut, Plus } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import LoginForm from "@/components/login-form";
 import PixelScene from "@/components/pixel-scene";
@@ -133,9 +133,10 @@ function Home() {
 						</button>
 						<button
 							onClick={() => setShowAdd(true)}
-							className="btn-pixel bg-lime text-pine hover:bg-lime-deep"
+							className="btn-pixel bg-lime !px-3 text-pine hover:bg-lime-deep"
+							aria-label="New quest"
 						>
-							+ new quest
+							<Plus className="h-3.5 w-3.5" />
 						</button>
 					</div>
 				</header>
@@ -156,7 +157,7 @@ function Home() {
 									day: "numeric",
 								})}
 							</p>
-							<h1 className="font-display text-6xl leading-[0.9] text-chalk drop-shadow-[2px_2px_0_rgba(34,56,42,0.9)]">
+							<h1 className="font-display text-5xl leading-[0.9] text-chalk drop-shadow-[2px_2px_0_rgba(34,56,42,0.9)] sm:text-6xl">
 								Your quests
 							</h1>
 						</div>
@@ -251,7 +252,7 @@ function TrackerCard({
 					</span>
 				</span>
 			</div>
-			<div className="mt-4 grid grid-cols-14 gap-1">
+			<div className="mt-4 grid grid-cols-7 gap-1 sm:grid-cols-14">
 				{days.map((d) => {
 					const status = getDayStatus(d, tracker, set, today);
 					const isToday = toISO(d) === toISO(today);
@@ -259,7 +260,7 @@ function TrackerCard({
 						<div
 							key={toISO(d)}
 							className={[
-								"relative grid h-7 place-items-center rounded-[3px] border font-mono text-[9px]",
+								"relative grid aspect-square place-items-center rounded-[3px] border font-mono text-[10px] sm:text-[9px] sm:h-7 sm:aspect-auto",
 								status === "done"
 									? "tile border-pine bg-lime text-pine"
 									: status === "missed"
