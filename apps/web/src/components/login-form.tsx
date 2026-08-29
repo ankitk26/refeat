@@ -19,7 +19,7 @@ export default function LoginForm() {
 
 				<Button
 					variant="outline"
-					className="btn-pixel mt-7 w-full !border-pine bg-lime !font-pixel text-[11px] text-pine uppercase hover:bg-lime-deep"
+					className="btn-pixel mt-7 w-full !border-pine bg-lime !font-pixel text-[11px] text-pine uppercase hover:bg-lime-deep dark:bg-lime dark:text-pine dark:hover:bg-lime-deep"
 					onClick={() =>
 						authClient.signIn.social({ provider: "google", callbackURL: "/" })
 					}
