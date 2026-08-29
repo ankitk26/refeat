@@ -160,7 +160,7 @@ function Home() {
 								Your quests
 							</h1>
 						</div>
-						<div className="shrink-0 rounded-md border-2 border-pine bg-paper px-3 py-2 text-center shadow-[3px_3px_0_0_var(--pine)]">
+						<div className="shrink-0 rounded-md border-2 border-pine bg-paper px-3 py-2 text-center shadow-[3px_3px_0_0_var(--pine)] dark:shadow-[3px_3px_0_0_var(--lime-deep)]">
 							<p className="font-display text-3xl leading-none text-foreground">
 								{dueToday}
 							</p>
@@ -263,10 +263,10 @@ function TrackerCard({
 								status === "done"
 									? "tile border-pine bg-lime text-pine"
 									: status === "missed"
-										? "tile border-pine bg-clay text-cloud"
+										? "tile border-pine bg-clay text-chalk"
 										: status === "not_required"
-											? "tile-off border-transparent bg-secondary/70 text-muted-foreground/40"
-											: "tile-off border-input bg-card text-muted-foreground",
+											? "tile-off border-transparent bg-secondary/70 text-muted-foreground dark:bg-secondary"
+											: "tile-off border-input bg-card text-muted-foreground dark:bg-input/30",
 								isToday && status === "pending"
 									? "!border-pine !bg-pine !text-lime font-bold tile-today"
 									: isToday
@@ -323,7 +323,7 @@ function AddTrackerDialog({ onClose }: { onClose: () => void }) {
 					</h3>
 					<button
 						onClick={onClose}
-						className="grid h-7 w-7 place-items-center rounded-[3px] border-2 border-pine bg-card font-pixel text-[10px] text-muted-foreground shadow-[2px_2px_0_0_var(--pine)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+						className="grid h-7 w-7 place-items-center rounded-[3px] border-2 border-pine bg-card font-pixel text-[10px] text-muted-foreground shadow-[2px_2px_0_0_var(--pine)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none dark:border-border dark:bg-input/30 dark:shadow-[2px_2px_0_0_rgba(0,0,0,0.55)]"
 					>
 						✕
 					</button>
@@ -333,7 +333,7 @@ function AddTrackerDialog({ onClose }: { onClose: () => void }) {
 						value={title}
 						onChange={(e) => setTitle(e.target.value)}
 						placeholder="e.g. Read 10 pages"
-						className="w-full rounded-md border-2 border-pine bg-background px-3 py-2.5 text-sm font-medium outline-none placeholder:text-muted-foreground/50 focus:bg-card"
+						className="w-full rounded-md border-2 border-pine bg-background px-3 py-2.5 text-sm font-medium outline-none placeholder:text-muted-foreground focus:bg-card dark:border-border dark:bg-input/30"
 						required
 						maxLength={48}
 					/>
@@ -346,7 +346,7 @@ function AddTrackerDialog({ onClose }: { onClose: () => void }) {
 								type="date"
 								value={startDate}
 								onChange={(e) => setStartDate(e.target.value)}
-								className="rounded-md border-2 border-pine bg-background px-2.5 py-2 font-mono text-[11px] outline-none"
+								className="rounded-md border-2 border-pine bg-background px-2.5 py-2 font-mono text-[11px] outline-none dark:border-border dark:bg-input/30"
 								required
 							/>
 						</label>
@@ -358,7 +358,7 @@ function AddTrackerDialog({ onClose }: { onClose: () => void }) {
 								type="date"
 								value={targetDate}
 								onChange={(e) => setTargetDate(e.target.value)}
-								className="rounded-md border-2 border-pine bg-background px-2.5 py-2 font-mono text-[11px] outline-none"
+								className="rounded-md border-2 border-pine bg-background px-2.5 py-2 font-mono text-[11px] outline-none dark:border-border dark:bg-input/30"
 							/>
 						</label>
 					</div>
@@ -377,8 +377,8 @@ function AddTrackerDialog({ onClose }: { onClose: () => void }) {
 										className={[
 											"flex-1 rounded-[3px] border-2 py-1.5 font-pixel text-[9px] tracking-wide uppercase",
 											isActivePreset
-												? "border-pine bg-forest text-primary-foreground shadow-[2px_2px_0_0_var(--lime-deep)]"
-												: "border-input bg-card text-muted-foreground hover:bg-secondary",
+												? "border-pine bg-forest text-chalk shadow-[2px_2px_0_0_var(--lime-deep)]"
+												: "border-input bg-card text-muted-foreground hover:bg-secondary dark:bg-input/30",
 										].join(" ")}
 									>
 										{preset.label}
@@ -395,8 +395,8 @@ function AddTrackerDialog({ onClose }: { onClose: () => void }) {
 									className={[
 										"grid h-9 place-items-center rounded-[3px] border-2 font-pixel text-[10px]",
 										frequency.includes(day.value)
-											? "tile border-pine bg-forest text-primary-foreground"
-											: "border-input bg-card text-muted-foreground hover:bg-secondary",
+											? "tile border-pine bg-forest text-chalk"
+											: "border-input bg-card text-muted-foreground hover:bg-secondary dark:bg-input/30",
 									].join(" ")}
 								>
 									{day.label}

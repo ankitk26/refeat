@@ -27,7 +27,7 @@ export default function LoginForm() {
 					▶ Continue with Google
 				</Button>
 
-				<p className="mt-6 font-pixel text-[9px] text-muted-foreground/70">
+				<p className="mt-6 font-pixel text-[9px] text-muted-foreground">
 					accept a quest · grow your streak
 				</p>
 			</div>

@@ -26,10 +26,10 @@
 	--secondary: #e2e7c9;
 	--secondary-foreground: #22382a;
 	--muted: #e2e7c9;
-	--muted-foreground: #6f8168;
+	--muted-foreground: #57694f;
 	--accent: #dce4bf;
 	--accent-foreground: #22382a;
-	--destructive: #b96844;
+	--destructive: #9d5430;
 	--border: #3d5233;
 	--input: #c9d1a8;
 	--ring: #2f4a35;
@@ -37,15 +37,15 @@
 
 	/* refeat custom — bg-lime, bg-sky, bg-pine, bg-clay … */
 	--lime: #a9bd63;
-	--lime-deep: #8ba14e;
+	--lime-deep: #90a552;
 	--moss: #6f8168;
 	--forest: #2f4a35;
 	--pine: #22382a;
 	--sky: #7ea7bb;
 	--sky-light: #a9c6d3;
 	--sky-deep: #628fa3;
-	--clay: #b96844;
-	--clay-deep: #9d5436;
+	--clay: #9d5436;
+	--clay-deep: #7f4227;
 	--cloud: #eef0dc;
 	--meadow: #8fae4e;
 	--paper: #f8f6e8;
@@ -57,9 +57,9 @@
 .dark {
 	--background: #14201a;
 	--foreground: #eef0dc;
-	--card: #1c2b21;
+	--card: #1f3126;
 	--card-foreground: #eef0dc;
-	--popover: #1c2b21;
+	--popover: #1f3126;
 	--popover-foreground: #eef0dc;
 	--primary: #a9bd63;
 	--primary-foreground: #1d2f24;
@@ -77,16 +77,16 @@
 	--lime: #a9bd63;
 	--lime-deep: #93a855;
 	--moss: #93a68a;
-	--forest: #1c2b21;
+	--forest: #2f4a35;
 	--pine: #14201a;
 	--sky: #5d8496;
 	--sky-light: #3d5a67;
 	--sky-deep: #48606e;
-	--clay: #c97a55;
-	--clay-deep: #a2603f;
+	--clay: #9d5436;
+	--clay-deep: #8f5029;
 	--cloud: #243628;
 	--meadow: #7a9440;
-	--paper: #1c2b21;
+	--paper: #1f3126;
 	--chalk: #eef0dc;
 }
 
@@ -151,6 +151,14 @@
 		);
 		background-size: 22px 22px;
 	}
+	.dark body {
+		/* same grain, lightened for the dark page */
+		background-image: radial-gradient(
+			circle at 2px 2px,
+			rgba(238, 240, 220, 0.035) 1px,
+			transparent 0
+		);
+	}
 	html {
 		font-family: var(--font-sans);
 	}
@@ -163,6 +171,7 @@
 		box-shadow: 4px 4px 0 0 var(--pine);
 	}
 	.dark .panel {
+		border-color: var(--border);
 		box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.55);
 	}
 
@@ -200,6 +209,14 @@
 	/* "you are here" cell: inverted tile with a flickering pixel shadow */
 	.tile-today {
 		box-shadow: 3px 3px 0 0 var(--lime-deep);
+	}
+
+	/* dark: black inset bevels vanish on dark surfaces — flip to a faint light edge */
+	.dark :where(.tile:not(.tile-today)) {
+		box-shadow: inset 0 -3px 0 0 rgba(255, 255, 255, 0.07);
+	}
+	.dark :where(.tile-off:not(.tile-today)) {
+		box-shadow: inset 0 -2px 0 0 rgba(255, 255, 255, 0.04);
 	}
 
 	/* staggered page-load reveal */

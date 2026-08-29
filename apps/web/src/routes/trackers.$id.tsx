@@ -160,7 +160,7 @@ function TrackerDetail() {
 					<ThemeToggle />
 					<button
 						onClick={remove}
-						className="btn-pixel border-clay-deep bg-clay text-cloud shadow-[3px_3px_0_0_var(--clay-deep)] hover:bg-clay-deep"
+						className="btn-pixel border-clay-deep bg-clay text-chalk shadow-[3px_3px_0_0_var(--clay-deep)] hover:bg-clay-deep"
 					>
 						delete
 					</button>
@@ -222,7 +222,7 @@ function TrackerDetail() {
 						{WEEKDAYS_SHORT.map((w, i) => (
 							<div
 								key={i}
-								className="font-pixel text-[9px] tracking-wide text-muted-foreground/60 uppercase"
+								className="font-pixel text-[9px] tracking-wide text-muted-foreground uppercase"
 							>
 								{w}
 							</div>
@@ -258,10 +258,10 @@ function TrackerDetail() {
 												status === "done"
 													? "tile border-pine bg-lime text-pine"
 													: status === "missed"
-														? "tile border-pine bg-clay text-cloud"
+														? "tile border-pine bg-clay text-chalk"
 														: status === "not_required"
-															? "tile-off border-transparent bg-secondary/70 text-muted-foreground/40"
-															: "tile-off border-input bg-card text-muted-foreground",
+															? "tile-off border-transparent bg-secondary/70 text-muted-foreground dark:bg-secondary"
+															: "tile-off border-input bg-card text-muted-foreground dark:bg-input/30",
 												isToday && clickable && status === "pending"
 													? "!border-pine !bg-pine !text-lime font-bold tile-today"
 													: isToday
@@ -288,7 +288,7 @@ function TrackerDetail() {
 							missed
 						</span>
 						<span className="flex items-center gap-1.5">
-							<span className="h-2.5 w-2.5 rounded-[2px] border border-input bg-card" />
+							<span className="h-2.5 w-2.5 rounded-[2px] border border-input bg-card dark:bg-input/30" />
 							pending
 						</span>
 						<span className="flex items-center gap-1.5">
@@ -327,7 +327,7 @@ function TrackerDetail() {
 									</button>
 									<button
 										onClick={() => applyStatus(statusDate, "missed")}
-										className="btn-pixel border-clay-deep bg-clay text-sm text-cloud uppercase shadow-[3px_3px_0_0_var(--clay-deep)] hover:bg-clay-deep"
+										className="btn-pixel border-clay-deep bg-clay text-sm text-chalk uppercase shadow-[3px_3px_0_0_var(--clay-deep)] hover:bg-clay-deep"
 									>
 										missed
 									</button>
