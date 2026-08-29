@@ -11,6 +11,7 @@ This project was created with [Better-T-Stack](https://github.com/AmanVarshney01
 - **Convex** - Reactive backend-as-a-service platform
 - **Authentication** - Better-Auth
 - **Oxlint** - Oxlint + Oxfmt (linting & formatting)
+- **Deployment** - Cloudflare Workers (web) + Convex cloud (backend)
 
 ## Getting Started
 
@@ -90,3 +91,63 @@ refeat/
 - `pnpm run dev:setup`: Setup and configure your Convex project
 - `pnpm run check-types`: Check TypeScript types across all apps
 - `pnpm run check`: Run Oxlint and Oxfmt
+- `pnpm run deploy`: Deploy backend (Convex) + frontend (Cloudflare Workers)
+
+## Deployment
+
+The web app is deployed as a **Cloudflare Worker** using `@cloudflare/vite-plugin` + `wrangler` (see `apps/web/wrangler.jsonc`). Convex functions are deployed to Convex cloud.
+
+One-time setup:
+
+```bash
+# Authenticate with Cloudflare (interactive, in a real terminal)
+pnpm --filter web exec wrangler login
+```
+
+Deploy everything:
+
+```bash
+pnpm run deploy
+```
+
+This runs `convex deploy` (pushes backend functions to the production Convex deployment) and then `vite build && wrangler deploy` for the web app.
+
+### Production environment variables
+
+`VITE_CONVEX_URL` and `VITE_CONVEX_SITE_URL` are baked into the client bundle at **build time** from `apps/web/.env`. Before a production deploy, make sure they point at the **production** Convex deployment (from `packages/backend/.env.local` / `npx convex deploy` output), not the dev one. For local overrides use `.env.production`, e.g.:
+
+```bash
+VITE_CONVEX_URL=https://<prod-deployment>.convex.cloud
+VITE_CONVEX_SITE_URL=https://<prod-deployment>.convex.site
+```
+
+To test the production build locally in workerd:
+
+```bash
+pnpm --filter web preview:cf
+```
+
+### Auth environment variables (Convex, not Cloudflare)
+
+Google OAuth runs inside Convex functions, so `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` and `BETTER_AUTH_SECRET` are **Convex environment variables** — nothing Google-related is configured on Cloudflare. Check/copy them with:
+
+```bash
+cd packages/backend
+npx convex env list          # dev deployment
+npx convex env list --prod   # production deployment
+npx convex env set GOOGLE_CLIENT_ID <value> --prod
+```
+
+### Post-deploy: SITE_URL + Google Cloud Console
+
+`SITE_URL` on the prod deployment must be your production web URL (used by better-auth as `baseURL`/`trustedOrigins` and to build the Google redirect). After the first `wrangler deploy` prints your Workers URL, run:
+
+```bash
+cd packages/backend
+npx convex env set SITE_URL https://<your-worker>.workers.dev --prod
+```
+
+Then in [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials) (OAuth client), add:
+
+- **Authorized JavaScript origin**: `https://<your-worker>.workers.dev`
+- **Authorized redirect URI**: `https://<prod-convex-deployment>.convex.site/api/auth/callback/google` (the prod deployment's `.convex.site` URL — it differs from the dev one)

@@ -14,7 +14,8 @@
 		"dev:server": "pnpm --filter @refeat/backend dev",
 		"dev:setup": "pnpm --filter @refeat/backend dev:setup",
 		"check": "oxlint && oxfmt --write",
-		"fmt": "oxfmt --write"
+		"fmt": "oxfmt --write",
+		"deploy": "pnpm --filter @refeat/backend deploy && pnpm --filter web deploy"
 	},
 	"dependencies": {
 		"@refeat/env": "workspace:*",
@@ -29,5 +30,12 @@
 		"oxlint": "^1.80.0",
 		"typescript": "catalog:"
 	},
-	"packageManager": "pnpm@10.26.0"
+	"packageManager": "pnpm@10.26.0",
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"@cloudflare/workerd-windows-64",
+			"esbuild",
+			"workerd"
+		]
+	}
 }
