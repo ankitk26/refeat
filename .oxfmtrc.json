@@ -6,7 +6,11 @@
 	"ignorePatterns": [
 		"packages/backend/convex/_generated/**",
 		"apps/web/src/routeTree.gen.ts",
-		"pnpm-lock.yaml"
+		"pnpm-lock.yaml",
+		".agent/**",
+		".agents/**",
+		".claude/**",
+		"tools/oxlint/anti-slop/**"
 	],
 	"sortImports": {
 		"newlinesBetween": false

@@ -64,6 +64,9 @@ export default function PixelScene({
 	return (
 		<svg
 			viewBox="0 0 120 54"
+			// False positive: shapeRendering is React's fixed DOM name for the SVG
+			// shape-rendering presentation attribute, not a domain symbol.
+			// oxlint-disable-next-line anti-slop/no-shape-in-symbol-names
 			shapeRendering="crispEdges"
 			className={`pixelated block w-full ${className}`}
 			aria-hidden="true"

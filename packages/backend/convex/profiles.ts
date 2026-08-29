@@ -22,8 +22,8 @@ export const ensureMyProfile = mutation({
 		if (existing) return existing._id;
 
 		// fallback to better-auth user email/name if available
-		const email = (ident as any).email ?? (ident as any).emailAddress ?? "";
-		const name = (ident as any).name ?? undefined;
+		const email = ident.email ?? "";
+		const name = ident.name;
 
 		// Try to get more accurate data from better-auth via authComponent if needed
 		// For now use identity fields

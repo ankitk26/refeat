@@ -9,6 +9,13 @@ import authConfig from "./auth.config";
 
 const siteUrl = process.env.SITE_URL!;
 
+/** Read a required env var, failing loudly at cold start instead of passing `undefined` along. */
+function requireEnv(name: string): string {
+	const value = process.env[name];
+	if (!value) throw new Error(`Missing required environment variable: ${name}`);
+	return value;
+}
+
 const authFunctions: AuthFunctions = internal.auth;
 
 export const authComponent = createClient<DataModel>(components.betterAuth, {
@@ -19,7 +26,7 @@ export const authComponent = createClient<DataModel>(components.betterAuth, {
 				await ctx.db.insert("profiles", {
 					authUserId: doc._id,
 					email: doc.email,
-					name: (doc as any).name ?? undefined,
+					name: doc.name,
 					createdAt: Date.now(),
 				});
 			},
@@ -32,7 +39,7 @@ export const authComponent = createClient<DataModel>(components.betterAuth, {
 				if (!profile) return;
 				await ctx.db.patch(profile._id, {
 					email: newDoc.email,
-					name: (newDoc as any).name ?? profile.name,
+					name: newDoc.name ?? profile.name,
 				});
 			},
 			onDelete: async (ctx, doc) => {
@@ -58,8 +65,8 @@ function createAuth(ctx: GenericCtx<DataModel>) {
 		},
 		socialProviders: {
 			google: {
-				clientId: process.env.GOOGLE_CLIENT_ID as string,
-				clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+				clientId: requireEnv("GOOGLE_CLIENT_ID"),
+				clientSecret: requireEnv("GOOGLE_CLIENT_SECRET"),
 				accessType: "offline",
 				prompt: "select_account",
 			},

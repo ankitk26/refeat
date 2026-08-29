@@ -1,5 +1,6 @@
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "@refeat/backend/convex/_generated/api";
+import type { Id } from "@refeat/backend/convex/_generated/dataModel";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
@@ -41,20 +42,26 @@ function TrackerGate() {
 
 function TrackerDetail() {
 	const { id } = Route.useParams();
+	// SAFETY: route params arrive as plain strings; the Id<"trackers"> brand is
+	// a compile-time label only, and the server re-validates the id in its
+	// argument validator, so an ill-formed id simply resolves to not-found.
+	const trackerId = id as Id<"trackers">;
 	const navigate = useNavigate();
 	const convex = useConvex();
 
 	const trackerQuery = useQuery(
-		convexQuery(api.trackers.get, { id: id as any }),
+		convexQuery(api.trackers.get, { id: trackerId }),
 	);
 	const completionsQuery = useQuery(
-		convexQuery(api.completions.listByTracker, { trackerId: id as any }),
+		convexQuery(api.completions.listByTracker, {
+			trackerId,
+		}),
 	);
 
 	const tracker = trackerQuery.data;
 	const completions = completionsQuery.data ?? [];
 	const set = useMemo(
-		() => new Set<string>(completions.map((c: any) => c.date as string)),
+		() => new Set(completions.map((c) => c.date)),
 		[completions],
 	);
 
@@ -123,13 +130,13 @@ function TrackerDetail() {
 		if (getDayStatus(fromISO(date), tracker!, set, today) === "not_required")
 			return;
 		await convex.mutation(api.completions.toggle, {
-			trackerId: id as any,
+			trackerId,
 			date,
 		});
 	}
 	async function remove() {
 		if (!confirm("Delete?")) return;
-		await convex.mutation(api.trackers.remove, { id: id as any });
+		await convex.mutation(api.trackers.remove, { id: trackerId });
 		navigate({ to: "/" });
 	}
 

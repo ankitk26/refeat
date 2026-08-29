@@ -1,5 +1,6 @@
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "@refeat/backend/convex/_generated/api";
+import type { Doc } from "@refeat/backend/convex/_generated/dataModel";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
@@ -80,7 +81,7 @@ function Home() {
 	const trackers = trackersQuery.data ?? [];
 	const completedTrackerIdsToday = new Set(
 		(completionsTodayQuery.data ?? []).map(
-			(completion: any) => completion.trackerId as string,
+			(completion) => completion.trackerId,
 		),
 	);
 	const ensureProfile = useConvexMutation(api.profiles.ensureMyProfile);
@@ -88,7 +89,7 @@ function Home() {
 		ensureProfile({}).catch(() => {});
 	}, [ensureProfile]);
 
-	const dueToday = trackers.filter((tracker: any) => {
+	const dueToday = trackers.filter((tracker) => {
 		const todayIso = toISO(today);
 		const hasStarted = tracker.startDate <= todayIso;
 		const notFinished = !tracker.targetDate || tracker.targetDate >= todayIso;
@@ -201,7 +202,7 @@ function Home() {
 							</div>
 						</div>
 					)}
-					{trackers.map((t: any, i: number) => (
+					{trackers.map((t, i) => (
 						<TrackerCard key={t._id} tracker={t} index={i} />
 					))}
 				</div>
@@ -211,13 +212,19 @@ function Home() {
 	);
 }
 
-function TrackerCard({ tracker, index }: { tracker: any; index: number }) {
+function TrackerCard({
+	tracker,
+	index,
+}: {
+	tracker: Doc<"trackers">;
+	index: number;
+}) {
 	const completionsQuery = useQuery(
 		convexQuery(api.completions.listByTracker, { trackerId: tracker._id }),
 	);
 	const completions = completionsQuery.data ?? [];
 	const set = useMemo(
-		() => new Set<string>(completions.map((c: any) => c.date as string)),
+		() => new Set(completions.map((c) => c.date)),
 		[completions],
 	);
 	const today = useMemo(() => new Date(), []);

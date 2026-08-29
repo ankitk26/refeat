@@ -1,12 +1,17 @@
 import { v } from "convex/values";
+import type { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
+import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { getCurrentProfileOrThrow } from "./model/profiles";
 
-async function requireProfile(ctx: any) {
+async function requireProfile(ctx: QueryCtx | MutationCtx) {
 	return await getCurrentProfileOrThrow(ctx);
 }
 
-async function requireTrackerOwner(ctx: any, trackerId: any) {
+async function requireTrackerOwner(
+	ctx: QueryCtx | MutationCtx,
+	trackerId: Id<"trackers">,
+) {
 	const profileId = await requireProfile(ctx);
 	const tracker = await ctx.db.get(trackerId);
 	if (!tracker) throw new Error("Tracker not found");
@@ -57,6 +62,14 @@ export const create = mutation({
 	},
 });
 
+/** Mutable tracker fields; mirrors the `trackers` table in schema.ts. */
+type TrackerPatch = {
+	title?: string;
+	startDate?: string;
+	targetDate?: string;
+	frequency?: number[];
+};
+
 export const update = mutation({
 	args: {
 		id: v.id("trackers"),
@@ -67,7 +80,7 @@ export const update = mutation({
 	},
 	handler: async (ctx, args) => {
 		const { tracker } = await requireTrackerOwner(ctx, args.id);
-		const patch: Record<string, unknown> = {};
+		const patch: TrackerPatch = {};
 		if (args.title !== undefined) {
 			if (!args.title.trim()) throw new Error("Title required");
 			patch.title = args.title.trim();

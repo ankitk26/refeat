@@ -22,10 +22,11 @@
 		"zod": "catalog:"
 	},
 	"devDependencies": {
+		"@oxlint/plugins": "1.80.0",
 		"@refeat/config": "workspace:*",
 		"@types/node": "catalog:",
 		"oxfmt": "^0.63.0",
-		"oxlint": "^1.78.0",
+		"oxlint": "^1.80.0",
 		"typescript": "catalog:"
 	},
 	"packageManager": "pnpm@10.26.0"

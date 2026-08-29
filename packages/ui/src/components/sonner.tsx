@@ -13,6 +13,9 @@ import { Toaster as Sonner, type ToasterProps } from "sonner";
 const Toaster = ({ ...props }: ToasterProps) => {
 	const { theme = "system" } = useTheme();
 
+	// SAFETY: next-themes' theme is the same "light" | "dark" | "system" union
+	// sonner expects, and the style keys below are CSS custom properties that
+	// React.CSSProperties cannot spell but passes through to the DOM verbatim.
 	return (
 		<Sonner
 			theme={theme as ToasterProps["theme"]}

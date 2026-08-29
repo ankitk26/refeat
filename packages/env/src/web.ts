@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
 
@@ -12,6 +14,6 @@ export const env = createEnv({
 		VITE_CONVEX_URL: convexUrlSchema("example.convex.cloud"),
 		VITE_CONVEX_SITE_URL: convexUrlSchema("example.convex.site"),
 	},
-	runtimeEnv: (import.meta as any).env,
+	runtimeEnv: import.meta.env,
 	emptyStringAsUndefined: true,
 });
