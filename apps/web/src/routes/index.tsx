@@ -1,6 +1,12 @@
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "@refeat/backend/convex/_generated/api";
 import type { Doc } from "@refeat/backend/convex/_generated/dataModel";
+import {
+	Dialog,
+	DialogContent,
+	DialogTitle,
+	DialogXButton,
+} from "@refeat/ui/components/dialog";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
@@ -206,7 +212,7 @@ function Home() {
 					))}
 				</div>
 			</div>
-			{showAdd && <AddTrackerDialog onClose={() => setShowAdd(false)} />}
+			<AddTrackerDialog open={showAdd} onOpenChange={setShowAdd} />
 		</div>
 	);
 }
@@ -284,7 +290,13 @@ function TrackerCard({
 	);
 }
 
-function AddTrackerDialog({ onClose }: { onClose: () => void }) {
+function AddTrackerDialog({
+	open,
+	onOpenChange,
+}: {
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+}) {
 	const [title, setTitle] = useState("");
 	const [startDate, setStartDate] = useState(() => toISO(new Date()));
 	const [targetDate, setTargetDate] = useState("");
@@ -300,34 +312,21 @@ function AddTrackerDialog({ onClose }: { onClose: () => void }) {
 	async function handleSubmit(e: React.FormEvent) {
 		e.preventDefault();
 		if (!title.trim()) return;
-		if (frequency.length === 0) return alert("Pick at least one day");
+		if (frequency.length === 0) return;
 		await mutateAsync({
 			title: title.trim(),
 			startDate,
 			targetDate: targetDate || undefined,
 			frequency,
 		});
-		onClose();
+		onOpenChange(false);
 	}
 	return (
-		<div
-			className="fixed inset-0 z-50 flex items-end justify-center bg-pine/50 p-0 backdrop-blur-[2px] md:items-center md:p-4"
-			onClick={onClose}
-		>
-			<div
-				onClick={(e) => e.stopPropagation()}
-				className="panel w-full max-w-md !rounded-b-none border-b-0 p-5 md:!rounded-b-lg md:border-b-2"
-			>
+		<Dialog open={open} onOpenChange={onOpenChange}>
+			<DialogContent>
 				<div className="flex items-center justify-between">
-					<h3 className="font-display text-4xl leading-none text-foreground">
-						New quest
-					</h3>
-					<button
-						onClick={onClose}
-						className="grid h-7 w-7 place-items-center rounded-[3px] border-2 border-pine bg-card font-pixel text-[10px] text-muted-foreground shadow-[2px_2px_0_0_var(--pine)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none dark:border-border dark:bg-input/30 dark:shadow-[2px_2px_0_0_rgba(0,0,0,0.55)]"
-					>
-						✕
-					</button>
+					<DialogTitle className="text-4xl">New quest</DialogTitle>
+					<DialogXButton aria-label="Close">✕</DialogXButton>
 				</div>
 				<form onSubmit={handleSubmit} className="mt-4 grid gap-3">
 					<input
@@ -407,14 +406,14 @@ function AddTrackerDialog({ onClose }: { onClose: () => void }) {
 					</div>
 					<button
 						type="submit"
-						disabled={isPending}
+						disabled={isPending || frequency.length === 0}
 						className="btn-pixel mt-1 w-full bg-lime text-sm text-pine hover:bg-lime-deep"
 					>
 						{isPending ? "accepting…" : "⚔ accept quest"}
 					</button>
 				</form>
-			</div>
-		</div>
+			</DialogContent>
+		</Dialog>
 	);
 }
 

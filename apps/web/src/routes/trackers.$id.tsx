@@ -1,12 +1,19 @@
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "@refeat/backend/convex/_generated/api";
 import type { Id } from "@refeat/backend/convex/_generated/dataModel";
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogDescription,
+	DialogTitle,
+} from "@refeat/ui/components/dialog";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
 import { useConvex } from "convex/react";
 import { useMemo, useState } from "react";
-import { createPortal } from "react-dom";
+import { toast } from "sonner";
 import LoginForm from "@/components/login-form";
 import ThemeToggle from "@/components/theme-toggle";
 import {
@@ -140,7 +147,7 @@ function TrackerDetail() {
 			setStatusDate(null);
 		} catch (err) {
 			console.error("set status failed:", err);
-			alert("Could not save — is the dev backend running?");
+			toast.error("Could not save — is the backend running?");
 		}
 	}
 	async function remove() {
@@ -301,91 +308,75 @@ function TrackerDetail() {
 							today
 						</span>
 					</div>
-					{confirmDelete &&
-						createPortal(
-							<div
-								className="fixed inset-0 z-50 flex items-end justify-center bg-pine/50 backdrop-blur-[2px] md:items-center md:p-4"
-								onClick={() => setConfirmDelete(false)}
-							>
-								<div
-									className="panel w-full max-w-xs !rounded-b-none border-b-0 p-5 md:!rounded-b-lg md:border-b-2"
-									onClick={(e) => e.stopPropagation()}
-								>
-									<h3 className="font-display text-3xl leading-none text-foreground">
-										Delete quest?
-									</h3>
-									<p className="mt-2 font-pixel text-[10px] leading-relaxed text-muted-foreground">
-										“{tracker.title}” and its history will be gone for good.
-									</p>
-									<div className="mt-4 grid grid-cols-2 gap-2">
-										<button
-											onClick={() => setConfirmDelete(false)}
-											className="btn-pixel bg-card text-sm text-foreground uppercase hover:bg-secondary"
-										>
-											keep it
-										</button>
-										<button
-											onClick={remove}
-											className="btn-pixel border-clay-deep bg-clay text-sm text-chalk uppercase shadow-[3px_3px_0_0_var(--clay-deep)] hover:bg-clay-deep"
-										>
-											delete
-										</button>
-									</div>
+					{confirmDelete && (
+						<Dialog
+							open
+							onOpenChange={(o) => {
+								if (!o) setConfirmDelete(false);
+							}}
+						>
+							<DialogContent className="md:max-w-xs">
+								<DialogTitle>Delete quest?</DialogTitle>
+								<DialogDescription className="mt-2">
+									“{tracker.title}” and its history will be gone for good.
+								</DialogDescription>
+								<div className="mt-4 grid grid-cols-2 gap-2">
+									<DialogClose className="btn-pixel bg-card text-sm text-foreground uppercase hover:bg-secondary">
+										keep it
+									</DialogClose>
+									<button
+										onClick={remove}
+										className="btn-pixel border-clay-deep bg-clay text-sm text-chalk uppercase shadow-[3px_3px_0_0_var(--clay-deep)] hover:bg-clay-deep"
+									>
+										delete
+									</button>
 								</div>
-							</div>,
-							document.body,
-						)}
-					{statusDate &&
-						tracker &&
-						createPortal(
-							<div
-								className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4"
-								onClick={() => setStatusDate(null)}
-							>
-								<div
-									className="panel w-full max-w-xs p-5"
-									onClick={(e) => e.stopPropagation()}
-								>
-									<p className="font-pixel text-[9px] tracking-widest text-muted-foreground uppercase">
-										set status
-									</p>
-									<h2 className="mt-1 font-display text-3xl text-foreground">
-										{formatShort(fromISO(statusDate))}
-									</h2>
-									<p className="mt-1 font-pixel text-[9px] text-muted-foreground uppercase">
-										now:{" "}
-										{getDayStatus(fromISO(statusDate), tracker, set, today)}
-									</p>
-									<div className="mt-4 grid gap-2">
-										<button
-											onClick={() => applyStatus(statusDate, "done")}
-											className="btn-pixel bg-lime text-sm text-pine uppercase hover:bg-lime-deep"
-										>
-											done
-										</button>
-										<button
-											onClick={() => applyStatus(statusDate, "missed")}
-											className="btn-pixel border-clay-deep bg-clay text-sm text-chalk uppercase shadow-[3px_3px_0_0_var(--clay-deep)] hover:bg-clay-deep"
-										>
-											missed
-										</button>
-										<button
-											onClick={() => applyStatus(statusDate, "pending")}
-											className="btn-pixel bg-card text-sm text-foreground uppercase hover:bg-secondary"
-										>
-											pending
-										</button>
-										<button
-											onClick={() => setStatusDate(null)}
-											className="btn-pixel bg-secondary text-sm text-muted-foreground uppercase"
-										>
-											cancel
-										</button>
-									</div>
+							</DialogContent>
+						</Dialog>
+					)}
+					{statusDate && tracker && (
+						<Dialog
+							open
+							onOpenChange={(o) => {
+								if (!o) setStatusDate(null);
+							}}
+						>
+							<DialogContent className="md:max-w-xs">
+								<p className="font-pixel text-[9px] tracking-widest text-muted-foreground uppercase">
+									set status
+								</p>
+								<DialogTitle className="mt-1">
+									{formatShort(fromISO(statusDate))}
+								</DialogTitle>
+								<p className="mt-1 font-pixel text-[9px] text-muted-foreground uppercase">
+									now: {getDayStatus(fromISO(statusDate), tracker, set, today)}
+								</p>
+								<div className="mt-4 grid gap-2">
+									<button
+										onClick={() => applyStatus(statusDate, "done")}
+										className="btn-pixel bg-lime text-sm text-pine uppercase hover:bg-lime-deep"
+									>
+										done
+									</button>
+									<button
+										onClick={() => applyStatus(statusDate, "missed")}
+										className="btn-pixel border-clay-deep bg-clay text-sm text-chalk uppercase shadow-[3px_3px_0_0_var(--clay-deep)] hover:bg-clay-deep"
+									>
+										missed
+									</button>
+									<button
+										onClick={() => applyStatus(statusDate, "pending")}
+										className="btn-pixel bg-card text-sm text-foreground uppercase hover:bg-secondary"
+									>
+										pending
+									</button>
+									<DialogClose className="btn-pixel bg-secondary text-sm text-muted-foreground uppercase">
+										cancel
+									</DialogClose>
 								</div>
-							</div>,
-							document.body,
-						)}
+							</DialogContent>
+						</Dialog>
+					)}
 				</section>
 			</div>
 		</div>
