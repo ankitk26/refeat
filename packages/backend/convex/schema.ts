@@ -22,6 +22,10 @@ export default defineSchema({
 		trackerId: v.id("trackers"),
 		date: v.string(), // YYYY-MM-DD
 		done: v.boolean(),
+		// explicit user-set status; legacy rows may only have `done`
+		status: v.optional(
+			v.union(v.literal("done"), v.literal("missed"), v.literal("pending")),
+		),
 		createdAt: v.number(),
 	})
 		.index("by_tracker", ["trackerId"])

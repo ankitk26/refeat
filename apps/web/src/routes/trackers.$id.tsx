@@ -9,10 +9,12 @@ import { useMemo, useState } from "react";
 import LoginForm from "@/components/login-form";
 import ThemeToggle from "@/components/theme-toggle";
 import {
+	formatShort,
 	fromISO,
 	getDayStatus,
 	getMonthDays,
 	toISO,
+	toStatusMap,
 	WEEKDAYS_SHORT,
 } from "@/lib/dates";
 
@@ -60,12 +62,10 @@ function TrackerDetail() {
 
 	const tracker = trackerQuery.data;
 	const completions = completionsQuery.data ?? [];
-	const set = useMemo(
-		() => new Set(completions.map((c) => c.date)),
-		[completions],
-	);
+	const set = useMemo(() => toStatusMap(completions), [completions]);
 
 	const today = useMemo(() => new Date(), []);
+	const [statusDate, setStatusDate] = useState<string | null>(null);
 	const [cursor, setCursor] = useState(
 		() => new Date(today.getFullYear(), today.getMonth(), 1),
 	);
@@ -101,7 +101,7 @@ function TrackerDetail() {
 		(d) => getDayStatus(d, tracker, set, today) === "done",
 	).length;
 	const requiredCount = days.filter((d) =>
-		["done", "failed", "pending", "future"].includes(
+		["done", "missed", "pending", "future"].includes(
 			getDayStatus(d, tracker, set, today),
 		),
 	).length;
@@ -125,14 +125,21 @@ function TrackerDetail() {
 		return s;
 	})();
 
-	async function toggle(date: string) {
-		if (date > toISO(today)) return;
-		if (getDayStatus(fromISO(date), tracker!, set, today) === "not_required")
-			return;
-		await convex.mutation(api.completions.toggle, {
-			trackerId,
-			date,
-		});
+	async function applyStatus(
+		date: string,
+		status: "done" | "missed" | "pending",
+	) {
+		try {
+			await convex.mutation(api.completions.setStatus, {
+				trackerId,
+				date,
+				status,
+			});
+			setStatusDate(null);
+		} catch (err) {
+			console.error("set status failed:", err);
+			alert("Could not save — is the dev backend running?");
+		}
 	}
 	async function remove() {
 		if (!confirm("Delete?")) return;
@@ -242,22 +249,24 @@ function TrackerDetail() {
 										<button
 											key={idx}
 											disabled={!clickable}
-											onClick={() => toggle(iso)}
+											onClick={() => setStatusDate(iso)}
 											className={[
 												"relative grid aspect-square place-items-center rounded-[3px] border-2 font-mono text-[11px]",
 												clickable
-													? "active:translate-y-[1px]"
+													? "cursor-pointer active:translate-y-[1px]"
 													: "cursor-default",
 												status === "done"
 													? "tile border-pine bg-lime text-pine"
-													: status === "failed"
+													: status === "missed"
 														? "tile border-pine bg-clay text-cloud"
 														: status === "not_required"
 															? "tile-off border-transparent bg-secondary/70 text-muted-foreground/40"
 															: "tile-off border-input bg-card text-muted-foreground",
-												isToday
+												isToday && clickable && status === "pending"
 													? "!border-pine !bg-pine !text-lime font-bold tile-today"
-													: "",
+													: isToday
+														? "!border-pine tile-today"
+														: "",
 											].join(" ")}
 										>
 											{d.getDate()}
@@ -291,6 +300,53 @@ function TrackerDetail() {
 							today
 						</span>
 					</div>
+					{statusDate && tracker && (
+						<div
+							className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4"
+							onClick={() => setStatusDate(null)}
+						>
+							<div
+								className="panel w-full max-w-xs p-5"
+								onClick={(e) => e.stopPropagation()}
+							>
+								<p className="font-pixel text-[9px] tracking-widest text-muted-foreground uppercase">
+									set status
+								</p>
+								<h2 className="mt-1 font-display text-3xl text-foreground">
+									{formatShort(fromISO(statusDate))}
+								</h2>
+								<p className="mt-1 font-pixel text-[9px] text-muted-foreground uppercase">
+									now: {getDayStatus(fromISO(statusDate), tracker, set, today)}
+								</p>
+								<div className="mt-4 grid gap-2">
+									<button
+										onClick={() => applyStatus(statusDate, "done")}
+										className="btn-pixel bg-lime text-sm text-pine uppercase hover:bg-lime-deep"
+									>
+										done
+									</button>
+									<button
+										onClick={() => applyStatus(statusDate, "missed")}
+										className="btn-pixel border-clay-deep bg-clay text-sm text-cloud uppercase shadow-[3px_3px_0_0_var(--clay-deep)] hover:bg-clay-deep"
+									>
+										missed
+									</button>
+									<button
+										onClick={() => applyStatus(statusDate, "pending")}
+										className="btn-pixel bg-card text-sm text-foreground uppercase hover:bg-secondary"
+									>
+										pending
+									</button>
+									<button
+										onClick={() => setStatusDate(null)}
+										className="btn-pixel bg-secondary text-sm text-muted-foreground uppercase"
+									>
+										cancel
+									</button>
+								</div>
+							</div>
+						</div>
+					)}
 				</section>
 			</div>
 		</div>

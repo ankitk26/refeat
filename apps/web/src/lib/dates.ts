@@ -42,9 +42,20 @@ export function weekday(date: Date): number {
 	return date.getDay(); // 0 Sun
 }
 
+/** Status stored on a completion row (explicitly set via the day dialog). */
+export type StoredDayStatus = "done" | "missed" | "pending";
+
+export function toStatusMap(
+	completions: { date: string; done?: boolean; status?: StoredDayStatus }[],
+): Map<string, StoredDayStatus> {
+	return new Map(
+		completions.map((c) => [c.date, c.status ?? (c.done ? "done" : "missed")]),
+	);
+}
+
 export type DayStatus =
 	| "done"
-	| "failed"
+	| "missed"
 	| "pending"
 	| "not_required"
 	| "future";
@@ -52,7 +63,7 @@ export type DayStatus =
 export function getDayStatus(
 	date: Date,
 	tracker: { startDate: string; targetDate?: string; frequency: number[] },
-	completionsSet: Set<string>,
+	completions: Map<string, StoredDayStatus>,
 	today: Date,
 ): DayStatus {
 	const iso = toISO(date);
@@ -65,7 +76,9 @@ export function getDayStatus(
 	}
 	const isRequired = tracker.frequency.includes(weekday(date));
 	if (!isRequired) return "not_required";
-	if (completionsSet.has(iso)) return "done";
+	// explicitly set status wins over the derived one
+	const stored = completions.get(iso);
+	if (stored) return stored;
 	// normalize today to midnight
 	const todayMid = new Date(
 		today.getFullYear(),
@@ -73,7 +86,7 @@ export function getDayStatus(
 		today.getDate(),
 	);
 	const dateMid = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-	if (dateMid < todayMid) return "failed";
+	if (dateMid < todayMid) return "missed";
 	if (isSameDay(date, today)) return "pending";
 	return "future";
 }
@@ -81,30 +94,30 @@ export function getDayStatus(
 export function computeMonthStats(
 	dates: Date[],
 	tracker: { startDate: string; targetDate?: string; frequency: number[] },
-	completionsSet: Set<string>,
+	completions: Map<string, StoredDayStatus>,
 	today: Date,
 ) {
 	let done = 0;
-	let failed = 0;
+	let missed = 0;
 	let required = 0;
 	for (const d of dates) {
-		const s = getDayStatus(d, tracker, completionsSet, today);
+		const s = getDayStatus(d, tracker, completions, today);
 		if (s === "done") {
 			done++;
 			required++;
-		} else if (s === "failed") {
-			failed++;
+		} else if (s === "missed") {
+			missed++;
 			required++;
 		} else if (s === "pending" || s === "future") {
 			required++;
 		}
 	}
-	return { done, failed, required };
+	return { done, missed, required };
 }
 
 export function computeCurrentStreak(
 	tracker: { startDate: string; targetDate?: string; frequency: number[] },
-	completionsSet: Set<string>,
+	completions: Map<string, StoredDayStatus>,
 	today: Date,
 ): number {
 	// Count consecutive required days up to today that are done, backwards
@@ -112,7 +125,7 @@ export function computeCurrentStreak(
 	const cursor = new Date(today);
 	// go back up to 120 days max
 	for (let i = 0; i < 180; i++) {
-		const status = getDayStatus(cursor, tracker, completionsSet, today);
+		const status = getDayStatus(cursor, tracker, completions, today);
 		if (status === "not_required" || status === "future") {
 			cursor.setDate(cursor.getDate() - 1);
 			continue;

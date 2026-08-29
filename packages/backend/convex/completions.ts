@@ -62,8 +62,17 @@ export const listForDate = query({
 	},
 });
 
-export const toggle = mutation({
-	args: { trackerId: v.id("trackers"), date: v.string() },
+/** Explicitly set a day's status from the day-status dialog. */
+export const setStatus = mutation({
+	args: {
+		trackerId: v.id("trackers"),
+		date: v.string(),
+		status: v.union(
+			v.literal("done"),
+			v.literal("missed"),
+			v.literal("pending"),
+		),
+	},
 	handler: async (ctx, args) => {
 		await requireTrackerOwner(ctx, args.trackerId);
 		const existing = await ctx.db
@@ -72,44 +81,17 @@ export const toggle = mutation({
 				q.eq("trackerId", args.trackerId).eq("date", args.date),
 			)
 			.unique();
-
-		if (existing) {
-			await ctx.db.delete(existing._id);
-			return null;
-		}
-		await ctx.db.insert("completions", {
+		const row = {
 			trackerId: args.trackerId,
 			date: args.date,
-			done: true,
-			createdAt: Date.now(),
-		});
-		return true;
-	},
-});
-
-export const setDone = mutation({
-	args: { trackerId: v.id("trackers"), date: v.string(), done: v.boolean() },
-	handler: async (ctx, args) => {
-		await requireTrackerOwner(ctx, args.trackerId);
-		const existing = await ctx.db
-			.query("completions")
-			.withIndex("by_tracker_date", (q) =>
-				q.eq("trackerId", args.trackerId).eq("date", args.date),
-			)
-			.unique();
-		if (args.done) {
-			if (!existing) {
-				await ctx.db.insert("completions", {
-					trackerId: args.trackerId,
-					date: args.date,
-					done: true,
-					createdAt: Date.now(),
-				});
-			} else if (!existing.done) {
-				await ctx.db.patch(existing._id, { done: true });
-			}
+			done: args.status === "done",
+			status: args.status,
+		};
+		if (existing) {
+			await ctx.db.patch(existing._id, row);
 		} else {
-			if (existing) await ctx.db.delete(existing._id);
+			await ctx.db.insert("completions", { ...row, createdAt: Date.now() });
 		}
+		return args.status;
 	},
 });

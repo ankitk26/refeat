@@ -20,6 +20,7 @@ import { useDarkMode } from "@/lib/dark-mode";
 import {
 	computeCurrentStreak,
 	getDayStatus,
+	toStatusMap,
 	getMonthDays,
 	toISO,
 } from "@/lib/dates";
@@ -80,9 +81,9 @@ function Home() {
 	);
 	const trackers = trackersQuery.data ?? [];
 	const completedTrackerIdsToday = new Set(
-		(completionsTodayQuery.data ?? []).map(
-			(completion) => completion.trackerId,
-		),
+		(completionsTodayQuery.data ?? [])
+			.filter((c) => (c.status ?? (c.done ? "done" : "missed")) === "done")
+			.map((completion) => completion.trackerId),
 	);
 	const ensureProfile = useConvexMutation(api.profiles.ensureMyProfile);
 	useEffect(() => {
@@ -223,10 +224,7 @@ function TrackerCard({
 		convexQuery(api.completions.listByTracker, { trackerId: tracker._id }),
 	);
 	const completions = completionsQuery.data ?? [];
-	const set = useMemo(
-		() => new Set(completions.map((c) => c.date)),
-		[completions],
-	);
+	const set = useMemo(() => toStatusMap(completions), [completions]);
 	const today = useMemo(() => new Date(), []);
 	const year = today.getFullYear();
 	const month = today.getMonth();
@@ -267,14 +265,16 @@ function TrackerCard({
 								"relative grid h-7 place-items-center rounded-[3px] border font-mono text-[9px]",
 								status === "done"
 									? "tile border-pine bg-lime text-pine"
-									: status === "failed"
+									: status === "missed"
 										? "tile border-pine bg-clay text-cloud"
 										: status === "not_required"
 											? "tile-off border-transparent bg-secondary/70 text-muted-foreground/40"
 											: "tile-off border-input bg-card text-muted-foreground",
-								isToday
+								isToday && status === "pending"
 									? "!border-pine !bg-pine !text-lime font-bold tile-today"
-									: "",
+									: isToday
+										? "!border-pine tile-today"
+										: "",
 							].join(" ")}
 						>
 							{d.getDate()}
