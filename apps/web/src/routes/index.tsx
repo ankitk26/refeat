@@ -315,7 +315,7 @@ function AddTrackerDialog({ onClose }: { onClose: () => void }) {
 		>
 			<div
 				onClick={(e) => e.stopPropagation()}
-				className="panel reveal w-full max-w-md !rounded-b-none border-b-0 p-5 md:!rounded-b-lg md:border-b-2"
+				className="panel w-full max-w-md !rounded-b-none border-b-0 p-5 md:!rounded-b-lg md:border-b-2"
 			>
 				<div className="flex items-center justify-between">
 					<h3 className="font-display text-4xl leading-none text-foreground">

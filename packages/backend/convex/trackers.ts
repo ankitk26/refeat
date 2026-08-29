@@ -23,11 +23,15 @@ export const list = query({
 	args: {},
 	handler: async (ctx) => {
 		const profileId = await requireProfile(ctx);
-		return await ctx.db
+		const trackers = await ctx.db
 			.query("trackers")
 			.withIndex("by_profile", (q) => q.eq("profileId", profileId))
 			.order("desc")
 			.collect();
+		console.log(
+			`[trackers.list] fetched ${trackers.length} trackers for profile ${profileId}`,
+		);
+		return trackers;
 	},
 });
 
